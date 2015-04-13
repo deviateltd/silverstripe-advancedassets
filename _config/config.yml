@@ -1,0 +1,37 @@
+---
+Name: advancedsecuredfiles
+After:
+  - 'framework/*'
+  - 'cms/*'
+Before:
+  - 'subsites/*'
+---
+FileNameFilter: # enable underscore
+  default_replacements: {'/\s/':'-','/_/':'_','/[^A-Za-z0-9+.\-_]+/':'','/[\-]{2,}/':'-','/^[\.\-]+/':''}
+Filesystem:
+  sync_blacklisted_patterns: {0:"/^_defaultlockimages$/i"}
+AssetAdmin:
+  url_segment: non-secured-assets
+NonSecuredAssetAdmin:
+  url_segment: assets
+File:
+  extensions:
+    - FileSecured
+Folder:
+  extensions:
+    - FolderSecured
+LeftAndMain:
+  extensions:
+    - SecuredFilesLeftAndMain
+SiteConfig:
+  extensions:
+    - AdvancedSecuredFilesSiteConfig
+DBField:
+  extensions:
+    - SecuredFileRichLinksExtension
+Controller:
+  extensions:
+    - SecuredFilesContentController
+HtmlEditorField_Toolbar:
+  extensions:
+    - SecuredFilesHtmlEditorField_Toolbar

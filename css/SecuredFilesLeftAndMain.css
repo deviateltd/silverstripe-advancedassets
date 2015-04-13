@@ -1,0 +1,32 @@
+.icon.icon-16.icon-securedassetadmin {background: url('../resource/images/padlock-gray-16x16.png'), 0, 0;}
+.icon.icon-16.icon-nonsecuredassetadmin{background-position: 0 -80px;}
+
+form.small .field input.text, form.small .field textarea, form.small .field select, form.small .field .TreeDropdownField, .field.small input.text, .field.small textarea, .field.small select, .field.small .TreeDropdownField { width: 100%; }
+.security-settings .clear { clear: both; }
+.security-settings .middleColumn { width: 510px; padding: 0; background: #fff; border: 1px solid #b3b3b3; -webkit-border-radius: 4px; -moz-border-radius: 4px; -ms-border-radius: 4px; -o-border-radius: 4px; border-radius: 4px; background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #efefef), color-stop(10%, #ffffff), color-stop(90%, #ffffff), color-stop(100%, #efefef)); background-image: -webkit-linear-gradient(#efefef, #ffffff 10%, #ffffff 90%, #efefef); background-image: -moz-linear-gradient(#efefef, #ffffff 10%, #ffffff 90%, #efefef); background-image: -o-linear-gradient(#efefef, #ffffff 10%, #ffffff 90%, #efefef); background-image: linear-gradient(#efefef, #ffffff 10%, #ffffff 90%, #efefef); }
+
+#Actions { box-shadow: none; border: none; padding: 0; }
+#Actions li { margin-left: 2px; }
+#Actions li:first-child { margin-left: 0; }
+#Actions li.secured-file-active { border-bottom: 1px solid #C0C0C2; background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #c0c0c0), color-stop(100%, #e6e6e6)); background: -webkit-linear-gradient(#c0c0c0, #e6e6e6); background: -moz-linear-gradient(#c0c0c0, #e6e6e6); background: -o-linear-gradient(#c0c0c0, #e6e6e6); background: -ms-linear-gradient(#c0c0c0, #e6e6e6); background: linear-gradient(#c0c0c0, #e6e6e6); background-color: silver; filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#C0C0C2', endColorstr='#E6E6E6'); /* IE6 & IE7 */ -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#C0C0C2', endColorstr='#E6E6E6')"; /* IE8 */ box-shadow: 0 1px 1px 0 #A0A0A0 inset; }
+#Actions li.secured-file-active:after { content: ''; display: block; position: absolute; top: 33px; left: 50%; margin-left: -6px; width: 12px; height: 12px; background: #F8F8F8; border-right: 1px solid #B3B3B3; border-top: 1px solid #B3B3B3; -moz-transform: rotate(-45deg); -webkit-transform: rotate(-45deg); pointer-events: none; z-index: 10; }
+
+#SecuritySettingsGroupField .middleColumn { margin-left: 184px; width: 510px; }
+#SecuritySettingsGroupField label.fieldholder-small-label { display: none; }
+#SecuritySettingsGroupField .fieldgroup-field { float: none; width: auto; padding: 0;}
+#SecuritySettingsGroupField .fieldgroup-field .fieldholder-small {padding: 0;}
+#SecuritySettingsGroupField .fieldgroup-field .fieldholder-small label { float: none; width: auto; margin: 0; padding: 0; }
+#SecuritySettingsGroupField .fieldgroup-field .fieldholder-small label.ss-ui-button { float: left; margin: 0 10px 0 0; }
+
+#SecuritySettingsGroupField .middleColumn > .fieldgroup-field > div {padding: 20px;}
+#SecuritySettingsGroupField .fieldgroup-field .optionset {padding-bottom: 0;}
+#SecuritySettingsGroupField .fieldgroup-field .optionset li{ float: none; width: 100%;line-height: 10px;}
+
+#SecuritySettingsGroupField .fieldgroup-field .datetime { margin-top: 0;}
+#SecuritySettingsGroupField .fieldgroup-field .datetime .middleColumn {margin-left: 0; width: auto; border: none; }
+#SecuritySettingsGroupField .fieldgroup-field .datetime .middleColumn input{height: 28px;  padding-left: 10px; }
+#SecuritySettingsGroupField .fieldgroup-field div.field.date, #SecuritySettingsGroupField .fieldgroup-field div.field.time{ display: inline-block; width: auto; }
+#SecuritySettingsGroupField .fieldgroup-field div.field.date .middleColumn input{width: 112px; background: url("../images/calendar-month.png") 92px 4px no-repeat;}
+#SecuritySettingsGroupField .fieldgroup-field div.field.time .middleColumn input{width: 92px; background: url("../images/clock-frame.png") 72px 4px no-repeat; }
+
+.ss-gridfield-item td b{font-weight: bold;}

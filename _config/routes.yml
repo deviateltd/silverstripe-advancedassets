@@ -1,0 +1,7 @@
+---
+Name: advancedsecuredfilesroute
+After: 'secureassets/*'
+---
+Director:
+  rules:
+    'assets': 'SecuredFileController'
