@@ -858,4 +858,43 @@ class FileSecured extends DataExtension implements PermissionProvider{
             return array();
         }
     }
+    
+	/**
+	 * Find a File object by the given filename. 
+     * 
+     * This is a clone of framework's {@link File::find()} method which
+     * doesn't seem to work. See framework issue #4076.
+	 * 
+	 * @param String $filename Matched against the "Name" property.
+	 * @return mixed null if not found, File object of found file
+	 */
+	public static function find_file($filename) {
+		// Get the base file if $filename points to a resampled file
+		$filename = preg_replace('/_resampled\/[^-]+-/', '', $filename);
+
+		// Split to folders and the actual filename, and traverse the structure.
+		$parts = explode("/", $filename);
+		$parentID = 0;
+		$item = null;
+		foreach($parts as $part) {
+			if($part == ASSETS_DIR && !$parentID) {
+                continue;
+            }
+            
+			$SQL_part = Convert::raw2sql($part);
+            if($parentID >0) {
+                $item = DataObject::get_one("File", "\"Name\" = '$SQL_part' AND \"ParentID\" = $parentID");
+            } else {
+                $item = DataObject::get_one("File", "\"Name\" = '$SQL_part'");
+            }
+            
+			if(!$item) {
+                break;
+            }
+            
+			$parentID = $item->ID;
+		}
+		
+		return $item;
+	}
 }

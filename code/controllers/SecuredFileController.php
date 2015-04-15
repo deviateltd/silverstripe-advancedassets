@@ -33,7 +33,7 @@ class SecuredFileController extends Controller {
         $url = array_key_exists('url', $_GET) ? $_GET['url'] : $_SERVER['REQUEST_URI'];
         // make the $url normalised as "assets/somefolder/somefile.ext, so we could find the file record if it has.
         $url = Director::makeRelative(ltrim(str_replace(BASE_URL, '', $url), '/'));
-        $file = File::find($url);
+        $file = FileSecured::find_file($url);
         if($this->canSendToBrowser($file)) {
             //when requesting a re-sampled image, $file is the original image, hence we need to reset the file path
             if(preg_match('/_resampled\/[^-]+-/', $url)) {
