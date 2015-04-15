@@ -8,11 +8,17 @@
  * {@link SecuredFileController::handleRequest()} will handle the requested security file, based on its accessibility
  */
 class SecuredFileController extends Controller {
+    
     /**
-     * handle the requests, checking the request file is downloadable
+     * Handle the requests, checking the request file is downloadable
+     * 
+     * @param SS_HTTPRequest $request
+     * @param DataModel $model
      */
     public function handleRequest(SS_HTTPRequest $request, DataModel $model) {
-        if(!$request) user_error("Controller::handleRequest() not passed a request!", E_USER_ERROR);
+        if(!$request) {
+            user_error("Controller::handleRequest() not passed a request!", E_USER_ERROR);
+        }
 
         $this->pushCurrent();
         $this->urlParams = $request->allParams();
@@ -34,24 +40,30 @@ class SecuredFileController extends Controller {
         // make the $url normalised as "assets/somefolder/somefile.ext, so we could find the file record if it has.
         $url = Director::makeRelative(ltrim(str_replace(BASE_URL, '', $url), '/'));
         $file = File::find($url);
-        if($this->canSendToBrowser($file)) {
-            //when requesting a re-sampled image, $file is the original image, hence we need to reset the file path
-            if(preg_match('/_resampled\/[^-]+-/', $url)) {
-                $file = new Image();
-                $file->Filename = $url;
-            }
-            $this->sendFileToBrowser($file);
-        } else {
-            if($file instanceof Image){
-                $this->sendLockpadSamepleImageToBrowser($file);
-            }else{
-                $this->treatFileAccordingToStatus($file);
+        if($file) {     
+            if($this->canSendToBrowser($file)) {
+                //when requesting a re-sampled image, $file is the original image, hence we need to reset the file path
+                if(preg_match('/_resampled\/[^-]+-/', $url)) {
+                    $file = new Image();
+                    $file->Filename = $url;
+                }
+                $this->sendFileToBrowser($file);
+            } else {
+                if($file instanceof Image){
+                    $this->sendLockpadSamepleImageToBrowser($file);
+                }else{
+                    $this->treatFileAccordingToStatus($file);
+                }
             }
         }
     }
 
-
-    public function treatFileAccordingToStatus($file){//this file can't be viewed, that is confirmed
+    /**
+     * 
+     * @param File $file
+     * @return void
+     */
+    public function treatFileAccordingToStatus($file){ //this file can't be viewed, that is confirmed
         $member = Member::currentUser();
         if($member && $member->exists()){
             $this->notAccessible();
@@ -320,8 +332,12 @@ class SecuredFileController extends Controller {
         //exit the script
         exit(0);
     }
-
-
+    
+    /**
+     * 
+     * @param File $file
+     * @return boolean
+     */
     public function canSendToBrowser(File $file = null) {
 
         //if backend, return true

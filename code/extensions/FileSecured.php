@@ -195,9 +195,10 @@ class FileSecured extends DataExtension implements PermissionProvider{
      * Also, returns if the document should be displayed on the front-end. Respecting the current reading mode
      * of the site and the embargo status.
      * I.e. if a document is embargoed until published, then it should still show up in draft mode.
-     * @return bool True or False depending on whether this document is embargoed
+     * 
+     * @return boolean True or False depending on whether this document is embargoed
      */
-    function canViewFrontByTime() {
+    public function canViewFrontByTime() {
         $canViewFrontByTime = !$this->isEmbargoed() && !$this->isExpired();
         return $canViewFrontByTime;
     }
