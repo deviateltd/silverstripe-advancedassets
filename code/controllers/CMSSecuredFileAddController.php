@@ -3,9 +3,11 @@
  * Author: Normann
  * Date: 13/08/14
  * Time: 11:15 AM
+ * 
+ * @todo Modify addFolder() and initValidate() to show messages within the CMS.
  */
-
 class CMSSecuredFileAddController extends CMSFileAddController{
+    
     private static $url_segment = 'assets-secured/add';
     private static $url_priority = 65;
     private static $required_permission_codes = 'CMS_ACCESS_SecuredAssetAdmin';
@@ -20,15 +22,25 @@ class CMSSecuredFileAddController extends CMSFileAddController{
         $this->initValidate();
     }
 
+    /**
+     * 
+     * Intial validation of incoming CMS requests before we do anything useful.
+     * 
+     * @return SS_HTTPResponse
+     * @todo Refactor into single static. There are v.close dupes of this in the other controllers.
+     */
     public function initValidate() {
-        if(isset($_GET['ID']) && is_numeric($_GET['ID'])){
-            $folder = DataObject::get_by_id("Folder", $_GET['ID']);
-            if($folder && $folder->exists()){
-                if(!$folder->Secured){
-                    die('not found');
+        $folderId = SecuredFilesystem::get_numeric_identifier($this, 'ID');
+        if($folderId) {
+            $folder = DataObject::get_by_id("Folder", $folderId);
+            if($folder && $folder->exists()) {
+                if(!$folder->Secured) {
+                    $message = _t('SecuredFilesystem.messages.ERROR_ACCESS_ONLY_IN_FILES');
+                    return SecuredFilesystem::show_access_message($this, $message);
                 }
-            }else{
-                die('not found');
+            } else {
+                $message = _t('SecuredFilesystem.messages.ERROR_FOLDER_NOT_EXISTS');
+                return SecuredFilesystem::show_access_message($this, $message);
             }
         }
     }
