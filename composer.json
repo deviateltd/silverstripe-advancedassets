@@ -1,26 +1,26 @@
 {
-  "name": "silverstripe/advancedsecuredfiles",
-  "type": "silverstripe-module",
-  "description": "make files / folders in a section of assets have restricted access in term of time / who can edit / who can view",
-  "homepage": "http://www.deviate.net.nz/",
-  "license": "Commercial",
-  "keywords": ["silverstripe", "deviate", "secured", "files"],
-  "authors": [
-    {
-      "name": "Normann Lou",
-      "email": "normann.lou@deviate.net.nz"
-    },
-    {
-      "name": "Mikael Mrozik",
-      "email": "mikael.mrozik@deviate.net.nz"
-    },
-    {
-      "name": "Russel Michell",
-      "email": "russel.michell@deviate.net.nz"
+    "name": "silverstripe/advancedsecuredfiles",
+    "type": "silverstripe-module",
+    "description": "make files / folders in a section of assets have restricted access in term of time / who can edit / who can view",
+    "homepage": "http://www.deviate.net.nz/",
+    "license": "Commercial",
+    "keywords": ["silverstripe", "deviate", "secured", "files"],
+    "authors": [
+        {
+            "name": "Normann Lou",
+            "email": "normann.lou@deviate.net.nz"
+        },
+        {
+            "name": "Mikael Mrozik",
+            "email": "mikael.mrozik@deviate.net.nz"
+        },
+        {
+            "name": "Russel Michell",
+            "email": "russel.michell@deviate.net.nz"
+        }
+    ],
+    "require": {
+        "silverstripe/framework": ">=3.1",
+        "silverstripe/cms": ">=3.1"
     }
-  ],
-  "require": {
-    "silverstripe/framework": ">=3.1",
-    "silverstripe/cms": ">=3.1"
-  }
 }
