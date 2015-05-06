@@ -3,9 +3,11 @@
  * Author: Normann
  * Date: 11/08/14
  * Time: 1:11 PM
+ * 
+ * @todo Modify addFolder() and initValidate() to show messages within the CMS.
  */
-
 class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
+    
     private static $url_segment = 'assets-secured';
     private static $url_rule = '/$Action/$ID';
     private static $menu_title = 'Secured Files';
@@ -24,18 +26,25 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
         $this->initValidate();
     }
 
+    /**
+     * 
+     * Intial validation of incoming CMS requests before we do anything useful.
+     * 
+     * @return SS_HTTPResponse
+     * @todo Refactor into single static. There are v.close dupes of this in the other controllers.
+     */
     public function initValidate() {
-        $id = $this->urlParams['ID'];
-        if($id === '0'){
-            $this->redirect(singleton("SecuredAssetAdmin")->Link());
-        }elseif($id && is_numeric($id)){
-            $folder = DataObject::get_by_id("Folder", $id);
-            if($folder && $folder->exists()){
-                if(!$folder->Secured){
-                    die('not found');
+        $folderId = SecuredFilesystem::get_numeric_identifier($this, 'ID');
+        if($folderId) {
+            $folder = DataObject::get_by_id("Folder", $folderId);
+            if($folder && $folder->exists()) {
+                if(!$folder->Secured) {
+                    $message = _t('SecuredFilesystem.messages.ERROR_ACCESS_ONLY_IN_FILES');
+                    return SecuredFilesystem::show_access_message($this, $message);
                 }
-            }else{
-                die('not found');
+            } else {
+                $message = _t('SecuredFilesystem.messages.ERROR_FOLDER_NOT_EXISTS');
+                return SecuredFilesystem::show_access_message($this, $message);
             }
         }
     }
@@ -241,18 +250,26 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
         $this->response->addHeader('X-Status', rawurlencode($message));
         return;
     }
-
-    public function addfolder($request){
-        if(isset($_GET['ParentID'])&& is_numeric($_GET['ParentID']) ){
-            $folder = DataObject::get_by_id("Folder", $_GET['ParentID']);
-            if($folder && $folder->exists()){
-                if(!$folder->Secured){
-                    die('not found');
-                }
-            }else{
-                die('not found');
+    
+    /**
+     * 
+     * @inheritdoc
+     * @param SS_HTTPRequest $request
+     * @return HTMLText
+     */
+    public function addfolder($request) {
+        $parentId = SecuredFilesystem::get_numeric_identifier($this, 'ParentID');
+        $folder = DataObject::get_by_id("Folder", $parentId);
+        if($folder && $folder->exists()) {
+            if(!$folder->Secured) {
+                $message = _t('SecuredFilesystem.messages.ERROR_ACCESS_ONLY_IN_FILES');
+                return SecuredFilesystem::show_access_message($this, $message);
             }
-        }
-        return parent::addfolder($request);
+            
+            return parent::addfolder($request);
+        } else {
+            $message = _t('SecuredFilesystem.messages.ERROR_FOLDER_NOT_EXISTS');
+            return SecuredFilesystem::show_access_message($this, $message);
+        }        
     }
 }
