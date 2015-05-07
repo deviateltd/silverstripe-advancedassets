@@ -1,11 +1,12 @@
 <?php
 /**
- * Author: Normann
- * Date: 13/08/14
- * Time: 10:54 AM
+ * 
+ * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
+ * @package silverstripe-advancedassets
+ * @todo How many of the "cloned" methods/props from {@link File} are actually neeed?
  */
-
-class FileSecured extends DataExtension implements PermissionProvider{
+class FileSecured extends DataExtension implements PermissionProvider {
+    
     private static $db = array(
         "Secured" => "Boolean",
         "CanViewType" => "Enum('Anyone,LoggedInUsers,OnlyTheseUsers,Inherit', 'Inherit')",
@@ -29,25 +30,30 @@ class FileSecured extends DataExtension implements PermissionProvider{
      */
     private static $cache_permissions = array();
 
-    public function updateCMSFields(FieldList $fields){
+    /**
+     * 
+     * @param FieldList $fields
+     * @return void
+     */
+    public function updateCMSFields(FieldList $fields) {
         $controller = Controller::curr();
-        if($controller instanceof SecuredAssetAdmin || $controller instanceof CMSSecuredFileAddController){
+        if($controller instanceof SecuredAssetAdmin || $controller instanceof CMSSecuredFileAddController) {
             Requirements::combine_files(
                 'securedassetsadmincmsfields.js',
                     array(
-                        SECURED_FILES_MODULE . '/thirdparty/javascript/jquery-ui/timepicker/jquery-ui-sliderAccess.js',
-                        SECURED_FILES_MODULE . '/thirdparty/javascript/jquery-ui/timepicker/jquery-ui-timepicker-addon.min.js',
-                        SECURED_FILES_MODULE . "/javascript/SecuredFilesLeftAndMain.js",
+                        SECURED_FILES_MODULE_DIR . '/thirdparty/javascript/jquery-ui/timepicker/jquery-ui-sliderAccess.js',
+                        SECURED_FILES_MODULE_DIR . '/thirdparty/javascript/jquery-ui/timepicker/jquery-ui-timepicker-addon.min.js',
+                        SECURED_FILES_MODULE_DIR . "/javascript/SecuredFilesLeftAndMain.js",
                     )
             );
-            Requirements::css(SECURED_FILES_MODULE . '/thirdparty/javascript/jquery-ui/timepicker/jquery-ui-timepicker-addon.min.css');
+            Requirements::css(SECURED_FILES_MODULE_DIR . '/thirdparty/javascript/jquery-ui/timepicker/jquery-ui-timepicker-addon.min.css');
 
             //local customization
-            Requirements::css(SECURED_FILES_MODULE . "/css/SecuredFilesLeftAndMain.css");
-            Requirements::javascript(SECURED_FILES_MODULE . "/javascript/SecuredFilesLeftAndMain.js");
+            Requirements::css(SECURED_FILES_MODULE_DIR . "/css/SecuredFilesLeftAndMain.css");
+            Requirements::javascript(SECURED_FILES_MODULE_DIR . "/javascript/SecuredFilesLeftAndMain.js");
 
             $isFile = true;
-            if(!is_a($this->owner,"Folder") && is_a($this->owner, "File")){
+            if(!is_a($this->owner,"Folder") && is_a($this->owner, "File")) {
                 $bottomTaskSelectionExtra =
                     '<li class="ss-ui-button" data-panel="embargo">Embargo</li>'.
                     '<li class="ss-ui-button" data-panel="expiry">Expiry</li>';
@@ -80,7 +86,7 @@ class FileSecured extends DataExtension implements PermissionProvider{
                     ->setConfig('dateformat', 'dd-MM-yyyy')->setConfig('datavalueformat', 'dd-MM-yyyy')
                     ->setAttribute('readonly', true);
                 $expiryDatetime->getTimeField()->setAttribute('readonly', true);
-            }else{
+            } else {
                 $bottomTaskSelectionExtra = "";
                 $isFile = false;
             }
@@ -94,7 +100,7 @@ class FileSecured extends DataExtension implements PermissionProvider{
                 "ParentID"
             );
 
-            if($isFile){
+            if($isFile) {
                 $securitySettingsGroup = FieldGroup::create(
                     FieldGroup::create(
                         $embargoTypeField,
@@ -105,7 +111,7 @@ class FileSecured extends DataExtension implements PermissionProvider{
                         $expiryDatetime
                     )->addExtraClass('expiry option-change-datetime')->setName("ExpiryGroupField")
                 );
-            }else{
+            } else {
                 $securitySettingsGroup = FieldGroup::create();
             }
 
@@ -169,22 +175,26 @@ class FileSecured extends DataExtension implements PermissionProvider{
             $fields->insertAfter($securitySettingsGroup, "BottomTaskSelection");
         }
 
-        if(!is_a($this->owner,"Folder") && is_a($this->owner, "File")){
+        if(!is_a($this->owner,"Folder") && is_a($this->owner, "File")) {
             $parentIDField = $fields->dataFieldByName("ParentID");
-            if($controller instanceof SecuredAssetAdmin){
+            if($controller instanceof SecuredAssetAdmin) {
                 $securedRoot = FileSecured::getSecuredRoot();
                 $parentIDField-> setTreeBaseID($securedRoot->ID);
                 $parentIDField->setFilterFunction(create_function('$node', "return \$node->Secured == 1;"));
-            }else {
+            } else {
                 $parentIDField->setFilterFunction(create_function('$node', "return \$node->Secured == 0;"));
             }
 
-            //SilverStripe core has a bug for search function now, so disable it for now.
+            // SilverStripe core has a bug for search function now, so disable it for now.
             $parentIDField->setShowSearch(false);
         }
     }
 
-    public function canViewFront(){
+    /**
+     * 
+     * @return boolean
+     */
+    public function canViewFront() {
         if(!$this->canViewFrontByTime()) {return false;}
         if(!$this->canViewFrontByUser()) {return false;}
         return true;
@@ -211,13 +221,13 @@ class FileSecured extends DataExtension implements PermissionProvider{
             return true;
         }
         // check different CanViewType accordingly
-        if (!$this->owner->CanViewType || $this->owner->CanViewType == 'Anyone'){ // check for empty spec
+        if (!$this->owner->CanViewType || $this->owner->CanViewType == 'Anyone') { // check for empty spec
             return true;
         }else if($this->owner->CanViewType == "LoggedInUsers") {
             return $member && $member->exists();
         }else if($this->owner->CanViewType == "OnlyTheseUsers") {
             return $member && $member->exists() && $member->inGroups($this->owner->ViewerGroups());
-        }else if($this->owner->CanViewType == "Inherit"){
+        }else if($this->owner->CanViewType == "Inherit") {
             $folder = Folder::get_by_id("Folder", $this->owner->ParentID);
             if($folder && $folder->exists()) {
                 return $folder->canViewFrontByUser($member);
@@ -306,7 +316,7 @@ class FileSecured extends DataExtension implements PermissionProvider{
         return $item;
     }
 
-    public static function getSecuredRoot(){
+    public static function getSecuredRoot() {
         return $securedRoot = Folder::get_one("Folder", "\"ParentID\" = '0' AND \"Secured\" = '1'");
     }
 
@@ -327,33 +337,33 @@ class FileSecured extends DataExtension implements PermissionProvider{
         }
     }
 
-    public function onAfterWrite(){
+    public function onAfterWrite() {
         if($this->owner->CanViewType != 'OnlyTheseUsers') {
             $viewerGroups = $this->owner->ViewerGroups();
-            if($viewerGroups && $viewerGroups->exists()){
+            if($viewerGroups && $viewerGroups->exists()) {
                     $viewerGroups->removeAll();
             }
         }
         if($this->owner->CanEditType != 'OnlyTheseUsers') {
             $editorGroups = $this->owner->EditorGroups();
-            if($editorGroups && $editorGroups->exists()){
+            if($editorGroups && $editorGroups->exists()) {
                 $editorGroups->removeAll();
             }
         }
     }
 
-    function ChildFoldersExcludeSecured(){
+    function ChildFoldersExcludeSecured() {
         $folders = $this->owner->ChildFolders();
         $folders = $folders->exclude("Secured", "1");
         return $folders;
     }
 
-    function ChildFoldersOnlySecured(){
+    function ChildFoldersOnlySecured() {
         $folders = $this->owner->ChildFolders();
         $folders = $folders->filter("Secured", "1");
         return $folders;
     }
-    public function getWhoCanViewHTML(){
+    public function getWhoCanViewHTML() {
         if(!$this->owner->Secured) return;
         switch($this->owner->CanViewType) {
             case 'Anyone':
@@ -398,7 +408,7 @@ class FileSecured extends DataExtension implements PermissionProvider{
         return $ret;
     }
 
-    public function getWhoCanEditHTML(){
+    public function getWhoCanEditHTML() {
         if(!$this->owner->Secured) return;
         switch($this->owner->CanEditType) {
             case 'LoggedInUsers':
@@ -441,15 +451,15 @@ class FileSecured extends DataExtension implements PermissionProvider{
 
     function getEmbargoHTML() {
         if(!$this->owner->Secured) return;
-        if($this->owner instanceof Folder){
+        if($this->owner instanceof Folder) {
             $ret = "N/A";
         }else{
-            switch($this->owner->EmbargoType){
+            switch($this->owner->EmbargoType) {
                 case 'Indefinitely':
                     $ret = "Embargoed forever";
                     break;
                 case 'UntilAFixedDate':
-                    if($embargoDate =  $this->owner->EmbargoedUntilDate){
+                    if($embargoDate =  $this->owner->EmbargoedUntilDate) {
                         $datetime = new SS_Datetime();
                         $datetime->setValue($embargoDate);
                         $now = $today = date('Y-m-d H:i:s');
@@ -473,12 +483,12 @@ class FileSecured extends DataExtension implements PermissionProvider{
 
     function getExpireHTML() {
         if(!$this->owner->Secured) return;
-        if($this->owner instanceof Folder){
+        if($this->owner instanceof Folder) {
             $ret = "N/A";
         }else{
-            switch($this->owner->ExpiryType){
+            switch($this->owner->ExpiryType) {
                 case 'AtAFixedDate':
-                    if($expireDate =  $this->owner->ExpireAtDate){
+                    if($expireDate =  $this->owner->ExpireAtDate) {
 
                         $datetime = new SS_Datetime();
                         $datetime->setValue($expireDate);
@@ -501,7 +511,7 @@ class FileSecured extends DataExtension implements PermissionProvider{
         return $ret;
     }
 
-    public function providePermissions(){
+    public function providePermissions() {
         //Access to '{title}' section
         return array(
             'SECURED_FILES_VIEW_ALL' => array(

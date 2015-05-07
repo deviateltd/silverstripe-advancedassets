@@ -1,22 +1,22 @@
 <?php
 /**
- * Author: Normann
- * Date: 3/11/2014
- * Time: 6:06 PM
+ * 
+ * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
+ * @package silverstripe-advancedassets
  */
-
-class SecuredFilesHtmlEditorField_Toolbar extends Extension{
-    function updateMediaForm(Form $form){
+class SecuredFilesHtmlEditorField_Toolbar extends Extension {
+    
+    public function updateMediaForm(Form $form) {
         $fields = $form->Fields();
         $parentIDField = $fields->dataFieldByName('ParentID');
 
-        if(!Permission::check(array("ADMIN", "SECURED_FILES_VIEW_ALL"))){
+        if(!Permission::check(array("ADMIN", "SECURED_FILES_VIEW_ALL"))) {
             $parentIDField->setFilterFunction(create_function('$node', "return \$node->Secured == 0;"));
         }
 
         if($parentID = $parentIDField->Value()) {
             $folder = DataObject::get_by_id('Folder', $parentID);
-            if($folder->Secured){
+            if($folder->Secured) {
                 $gridField = $fields->dataFieldByName('Files');
                 $config = $gridField->getConfig();
                 $columns = $config->getComponentByType('GridFieldDataColumns');
@@ -34,19 +34,30 @@ class SecuredFilesHtmlEditorField_Toolbar extends Extension{
         }
     }
 
-    public function updateLinkForm(Form $form){
+    /**
+     * 
+     * @param Form $form
+     * @return void
+     */
+    public function updateLinkForm(Form $form) {
         $fields = $form->Fields();
         $fileField = $fields->dataFieldByName('file');
-        if(!Permission::check(array("ADMIN", "SECURED_FILES_VIEW_ALL"))){
+        if(!Permission::check(array("ADMIN", "SECURED_FILES_VIEW_ALL"))) {
             $fileField->setFilterFunction(create_function('$node', "return \$node->Secured == 0;"));
         }
     }
 
-    //$this->extend('updateFieldsForImage', $fields, $url, $file);
-    public function updateFieldsForImage(FieldList $fields, $url, Image $file){
-        if(is_a($file, "HtmlEditorField_Image")){
+    /**
+     * 
+     * @param FieldList $fields
+     * @param string $url
+     * @param Image $file
+     * @return void
+     */
+    public function updateFieldsForImage(FieldList $fields, $url, Image $file) {
+        if(is_a($file, "HtmlEditorField_Image")) {
             $image = $file->getFile();
-            if($image && $image->exists() && $image->Secured){
+            if($image && $image->exists() && $image->Secured) {
                 $previewImage = $fields->fieldByName('FilePreview');
                 $previewData = $previewImage->fieldByName('FilePreviewData');
                 $previewData->insertAfter(

@@ -1,17 +1,23 @@
 <?php
 /**
- * Author: Normann
- * Date: 31/10/2014
- * Time: 2:56 PM
+ * 
+ * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
+ * @package silverstripe-advancedassets
+ * @see {@link RichLinksExtension}
  */
-
-class SecuredFileRichLinksExtension extends Extension{
+class SecuredFileRichLinksExtension extends Extension {
 
     private static $casting = array(
         'SecuredFileRichLinks' => 'HTMLText'
     );
 
-    public function getDefaultPadlockImagePathByConfig($file, $config){
+    /**
+     * 
+     * @param File $file
+     * @param Config $config
+     * @return type
+     */
+    public function getDefaultPadlockImagePathByConfig($file, $config) {
         if($file->isExpired() ){
             if(!$this->_no_longer_image){
                 $lockpadImage = $config->LockpadImageNoLongerAvailable();

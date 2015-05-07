@@ -1,21 +1,28 @@
 <?php
 /**
- * Author: Normann
- * Date: 14/08/14
- * Time: 2:35 PM
  *
  * {@link SecuredFilesystem::sync_secured()} overwrite {@link Filesystem::sync()} in a way that a folder
  * syncs its children safely, i.e, don't sync any secured child folder when the folder is non-secured,
  * and vise-versa.
  * 
+ * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
+ * @package silverstripe-advancedassets
+ * @see {@link FolderSecured::securedSyncChildren()}
  * @todo Modify show_access_message() to show messages within the CMS.
  */
 class SecuredFilesystem extends Filesystem {
     
+    /**
+     * 
+     * @param number $folderID
+     * @return type
+     */
     public static function sync_secured($folderID = null) {
         $folder = DataObject::get_by_id('Folder', (int) $folderID);
-        if(!($folder && $folder->exists())) $folder = singleton('Folder');
-        //{@link FolderSecured::securedSyncChildren()}
+        if(!($folder && $folder->exists())) {
+            $folder = singleton('Folder');
+        }
+        
         $results = $folder->securedSyncChildren();
         $finished = false;
         while(!$finished) {

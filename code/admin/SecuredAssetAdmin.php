@@ -1,9 +1,8 @@
 <?php
 /**
- * Author: Normann
- * Date: 11/08/14
- * Time: 1:11 PM
  * 
+ * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
+ * @package silverstripe-advancedassets
  * @todo Modify addFolder() and initValidate() to show messages within the CMS.
  */
 class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
@@ -11,7 +10,7 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
     private static $url_segment = 'assets-secured';
     private static $url_rule = '/$Action/$ID';
     private static $menu_title = 'Secured Files';
-    private static $menu_icon = "advancedsecuredfiles/resource/images/padlock-gray-16x16.png";
+    private static $menu_icon = "silverstripe-advancedassets/resource/images/padlock-gray-16x16.png";
     private static $tree_class = 'Folder';
     private static $menu_priority = 5;
 
@@ -52,19 +51,19 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
     static function instantiate() {
         $secured_root_folder = BASE_PATH . DIRECTORY_SEPARATOR .ASSETS_DIR . DIRECTORY_SEPARATOR . "_securedfiles";
 
-        if (!is_dir($secured_root_folder)) {
+        if(!is_dir($secured_root_folder)) {
             FileSecured::find_or_make_secured("_securedfiles/Uploads" );
         }
-        $resource_folder = BASE_PATH . DIRECTORY_SEPARATOR . SECURED_FILES_MODULE . DIRECTORY_SEPARATOR . 'resource';
+        $resource_folder = BASE_PATH . DIRECTORY_SEPARATOR . SECURED_FILES_MODULE_DIR . DIRECTORY_SEPARATOR . 'resource';
         $default_lock_images_foler = BASE_PATH . DIRECTORY_SEPARATOR .ASSETS_DIR . DIRECTORY_SEPARATOR . '_defaultlockimages';
-        if(!is_dir($default_lock_images_foler)){
+        if(!is_dir($default_lock_images_foler)) {
             mkdir($default_lock_images_foler,
                 Config::inst()->get('Filesystem', 'folder_create_mask')
             );
             $resource_images_folder = $resource_folder . DIRECTORY_SEPARATOR . 'images';
             $dir = dir($resource_images_folder);
-            while(false !== $entry = $dir->read()){
-                if ($entry == '.' || $entry == '..') {
+            while(false !== $entry = $dir->read()) {
+                if($entry == '.' || $entry == '..') {
                     continue;
                 }
                 copy($resource_images_folder. DIRECTORY_SEPARATOR . $entry,
@@ -79,9 +78,9 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
 
             $resource_images_folder = $resource_folder . DIRECTORY_SEPARATOR . 'images';
             $dir = dir($resource_images_folder);
-            while(false !== $entry = $dir->read()){
+            while(false !== $entry = $dir->read()) {
                 // Skip pointers
-                if ($entry == '.' || $entry == '..') {
+                if($entry == '.' || $entry == '..') {
                     continue;
                 }
                 copy($resource_images_folder. DIRECTORY_SEPARATOR . $entry,
@@ -90,7 +89,7 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
             }
         }*/
 
-        if (!file_exists($secured_root_folder . DIRECTORY_SEPARATOR . '.htaccess')) {
+        if(!file_exists($secured_root_folder . DIRECTORY_SEPARATOR . '.htaccess')) {
             $data = new ArrayData(array(
                 'base' => BASE_URL ? BASE_URL : '/',
                 'frameworkDir' => FRAMEWORK_DIR,
@@ -104,7 +103,7 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
         }
     }
 
-    public function getList(){
+    public function getList() {
         $list = parent::getList();
         $list = $list->filter("Secured", 1);
         $securedRoot = FileSecured::getSecuredRoot();
@@ -118,15 +117,15 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
     public function currentPageID() {
         if(is_numeric($this->request->requestVar('ID')))	{
             return $this->request->requestVar('ID');
-        } elseif (is_numeric($this->urlParams['ID'])) {
+        } elseif(is_numeric($this->urlParams['ID'])) {
             return $this->urlParams['ID'];
         } elseif(Session::get("{$this->class}.currentPage")) {
             return Session::get("{$this->class}.currentPage");
         } else {
             $securedRoot = FileSecured::getSecuredRoot();
-            if($securedRoot && $securedRoot->exists()){
+            if($securedRoot && $securedRoot->exists()) {
                 return $securedRoot->ID;
-            }else {
+            } else {
                 SecuredAssetAdmin::instantiate();
                 $securedRoot = FileSecured::getSecuredRoot();
                 return $securedRoot->ID;
@@ -185,12 +184,12 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
             $uploadBtn = null;
         }
 
-        foreach(array("ListView", "TreeView") as $viewName){
+        foreach(array("ListView", "TreeView") as $viewName) {
             $view = $form->Fields()->fieldByName("Root.".$viewName);
             foreach($view->Fields() as $f) {
-                if($f instanceof CompositeField){
-                    foreach($f->FieldList() as $cf){
-                        if($cf instanceof CompositeField){
+                if($f instanceof CompositeField) {
+                    foreach($f->FieldList() as $cf) {
+                        if($cf instanceof CompositeField) {
                             $cf->removeByName("UploadButton");
                             if($uploadBtn) {
                                 $cf->insertBefore($uploadBtn, "AddFolderButton");
@@ -219,12 +218,12 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
         $items = new ArrayList();
         $i = 0;
         foreach($itemsDefault as $item) {
-            if($i!==0){
+            if($i!==0) {
                 $items->push($item);
             }
             $i++;
         }
-        if(isset($items[0]->Title)){
+        if(isset($items[0]->Title)) {
             $items[0]->Title = _t("SECUREDASSETADMIN.SecuriedFiles", "Secured Files");
         }
         return $items;

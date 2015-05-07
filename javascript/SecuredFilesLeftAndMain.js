@@ -9,7 +9,6 @@
                 //add active state to the current button
                 $('#Actions ul li').removeClass('secured-file-active');
                 this.addClass('secured-file-active');
-                //$('li.dms-active').append('<span class="arrow"></span>');
 
                 //hide all inner field sections
                 var panel = $('#SecuritySettingsGroupField');

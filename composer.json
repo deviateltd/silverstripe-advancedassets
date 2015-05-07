@@ -1,10 +1,10 @@
 {
-    "name": "silverstripe/advancedsecuredfiles",
+    "name": "deviateltd/silverstripe-advancedassets",
     "type": "silverstripe-module",
-    "description": "make files / folders in a section of assets have restricted access in term of time / who can edit / who can view",
+    "description": "Adds fine-grained control over who has access to file and folders.",
     "homepage": "http://www.deviate.net.nz/",
-    "license": "Commercial",
-    "keywords": ["silverstripe", "deviate", "secured", "files"],
+    "license": "BSD",
+    "keywords": ["silverstripe", "deviate", "advanced", "assets", "files"],
     "authors": [
         {
             "name": "Normann Lou",
@@ -15,8 +15,8 @@
             "email": "mikael.mrozik@deviate.net.nz"
         },
         {
-            "name": "Russel Michell",
-            "email": "russel.michell@deviate.net.nz"
+            "name": "Russell Michell",
+            "email": "russell.michell@deviate.net.nz"
         }
     ],
     "require": {

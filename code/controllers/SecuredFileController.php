@@ -1,11 +1,9 @@
 <?php
 /**
- * Author: Normann
- * Date: 13/08/14
- * Time: 6:46 PM
- *
- *
- * {@link SecuredFileController::handleRequest()} will handle the requested security file, based on its accessibility
+ * 
+ * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
+ * @package silverstripe-advancedassets
+ * {@link SecuredFileController::handleRequest()} handles requested file, based on accessibility
  */
 class SecuredFileController extends Controller {
     
@@ -40,7 +38,7 @@ class SecuredFileController extends Controller {
         // make the $url normalised as "assets/somefolder/somefile.ext, so we could find the file record if it has.
         $url = Director::makeRelative(ltrim(str_replace(BASE_URL, '', $url), '/'));
         $file = File::find($url);
-        if($file){
+        if($file) {
             if($this->canSendToBrowser($file)) {
                 //when requesting a re-sampled image, $file is the original image, hence we need to reset the file path
                 if(preg_match('/_resampled\/[^-]+-/', $url)) {
@@ -49,7 +47,7 @@ class SecuredFileController extends Controller {
                 }
                 $this->sendFileToBrowser($file);
             } else {
-                if($file instanceof Image){
+                if($file instanceof Image) {
                     $this->sendLockpadSamepleImageToBrowser($file);
                 }else{
                     $this->treatFileAccordingToStatus($file);
@@ -63,13 +61,13 @@ class SecuredFileController extends Controller {
      * @param File $file
      * @return void
      */
-    public function treatFileAccordingToStatus($file){ //this file can't be viewed, that is confirmed
+    public function treatFileAccordingToStatus($file) {
         $member = Member::currentUser();
-        if($member && $member->exists()){
+        if($member && $member->exists()) {
             $this->notAccessible();
         }else{
             $canViewByTime = $file->canViewFrontByTime();
-            if(!$canViewByTime){
+            if(!$canViewByTime) {
                 $this->notAccessible();
             }else{
                 $this->redirectToLogIn();
@@ -77,7 +75,11 @@ class SecuredFileController extends Controller {
         }
     }
 
-    public function redirectToLogIn(){
+    /**
+     * 
+     * @return void
+     */
+    public function redirectToLogIn() {
         $backURL = $this->request->getURL(true);
         $this->response->setStatusCode(302);
         $this->response->addHeader('Location',  "/Security/login?BackURL=".urlencode($backURL));
@@ -85,16 +87,20 @@ class SecuredFileController extends Controller {
         exit(0);
     }
 
-    public function notAccessible(){
+    /**
+     * 
+     * @return void
+     */
+    public function notAccessible() {
         $config = SiteConfig::current_site_config();
-        if(!$content = $config->SecuredFileDefaultContent){
+        if(!$content = $config->SecuredFileDefaultContent) {
             $content = "<p>"._t('SecuredFileController.SecuredFileDefaultContent', "The document is not accessible")."</p>";
         }
-        if(!$title = $config->SecuredFileDefaultTitle){
+        if(!$title = $config->SecuredFileDefaultTitle) {
             $title = _t('SecuredFileController.SecuredFileDefaultTitle', "The document is not accessible");;
         }
 
-        if(isset($_GET['ContainerURL']) && $_GET['ContainerURL']){
+        if(isset($_GET['ContainerURL']) && $_GET['ContainerURL']) {
             $backLink = '<p><a href="'.$_GET['ContainerURL'].'">Go back</a></p>';
             $content = $backLink.$content.$backLink;
         }
@@ -118,7 +124,7 @@ class SecuredFileController extends Controller {
         echo $controller->renderWith(
             array('Page')
         )->Value;
-        //exit the script
+        
         exit(0);
     }
 
@@ -131,10 +137,16 @@ class SecuredFileController extends Controller {
      */
     private static $bandwidth_threshold = 10240;
 
-    public function getDefaultPadlockImagePathByConfig($file, $config){
-        if($file->isExpired() ){
+    /**
+     * 
+     * @param File $file
+     * @param Config $config
+     * @return string
+     */
+    public function getDefaultPadlockImagePathByConfig($file, $config) {
+        if($file->isExpired() ) {
             $lockpadImage = $config->LockpadImageNoLongerAvailable();
-            if(!$lockpadImage || !$lockpadImage->exists()){
+            if(!$lockpadImage || !$lockpadImage->exists()) {
                 if($file->isEmbargoed()) {
                     $lockpadImage = $config->LockpadImageNotYetAvailable();
                     if(!$lockpadImage || !$lockpadImage->exists()) {
@@ -142,9 +154,9 @@ class SecuredFileController extends Controller {
                     }
                 }
             }
-        }else if($file->isEmbargoed()){
+        } else if($file->isEmbargoed()) {
             $lockpadImage = $config->LockpadImageNotYetAvailable();
-            if(!$lockpadImage || !$lockpadImage->exists()){
+            if(!$lockpadImage || !$lockpadImage->exists()) {
                 if($file->isExpired()) {
                     $lockpadImage = $config->LockpadImageNoLongerAvailable();
                     if(!$lockpadImage || !$lockpadImage->exists()) {
@@ -152,22 +164,34 @@ class SecuredFileController extends Controller {
                     }
                 }
             }
-        }else{
+        } else {
             $lockpadImage = $config->LockpadImageNoAccess();
         }
-        if(isset($lockpadImage) && $lockpadImage && $lockpadImage->exists()){
+        
+        if(isset($lockpadImage) && $lockpadImage && $lockpadImage->exists()) {
             return $relativePath = $lockpadImage->Filename;
         }
     }
 
-    public function getDefaultPadlockLoginImagePathByConfig($config){
+    /**
+     * 
+     * @param Config $config
+     * @return string
+     */
+    public function getDefaultPadlockLoginImagePathByConfig($config) {
         $lockpadImage = $config->LockpadImageNeedLogIn();
-        if($lockpadImage && $lockpadImage->exists()){
+        if($lockpadImage && $lockpadImage->exists()) {
             return $relativePath = $lockpadImage->Filename;
         }
     }
 
-    public function getDefaultPadlockImagePath($file, $color){
+    /**
+     * 
+     * @param File $file
+     * @param string $color
+     * @return string
+     */
+    public function getDefaultPadlockImagePath($file, $color) {
         $originalFilePath = $file->getFullPath();
         if(file_exists($originalFilePath)) {
             $originalFileSize = filesize($originalFilePath);
@@ -181,26 +205,33 @@ class SecuredFileController extends Controller {
         else if($originalFileSize <= 2894) $width = 48;
         else if($originalFileSize <= 6797) $width = 96;
 
-        $name = "padlock-".$color."-".$width."x".$width.".png";
-        return $relativePath = ASSETS_DIR . DIRECTORY_SEPARATOR . "_defaultlockimages" . DIRECTORY_SEPARATOR . $name ;
+        $name = "padlock-" . $color . "-" . $width . "x" . $width . ".png";
+        $relPath = ASSETS_DIR . DIRECTORY_SEPARATOR . "_defaultlockimages" . DIRECTORY_SEPARATOR . $name ;
+        return $relPath;
     }
 
-    public function sendLockpadSamepleImageToBrowser($file, $color = 'color'){
+    /**
+     * 
+     * @param File $file
+     * @param string $color
+     * @return void
+     */
+    public function sendLockpadSamepleImageToBrowser($file, $color = 'color') {
         $path = null;
         $config = SiteConfig::current_site_config();
         $member = Member::currentUser();
-        if($member && $member->exists()){
+        if($member && $member->exists()) {
             $this->getDefaultPadlockImagePathByConfig($file, $config);
-        }else{
+        } else {
             $canViewByTime = $file->canViewFrontByTime();
-            if(!$canViewByTime){
+            if(!$canViewByTime) {
                 $relativePath = $this->getDefaultPadlockImagePathByConfig($file, $config);
-            }else{
+            } else {
                 $relativePath = $this->getDefaultPadlockLoginImagePathByConfig($config);
             }
         }
 
-        if(!$relativePath){
+        if(!$relativePath) {
             $relativePath = $this->getDefaultPadlockImagePath($file, $color);
         }
         $path = Director::baseFolder() . DIRECTORY_SEPARATOR .$relativePath;
@@ -219,6 +250,7 @@ class SecuredFileController extends Controller {
         } else {
             increase_time_limit_to();
         }
+        
         // send header
         header('Content-Description: File Transfer');
 
@@ -237,7 +269,7 @@ class SecuredFileController extends Controller {
          * issue fixes for IE6,7,8  when downloading a file over HTTPS (http://support.microsoft.com/kb/812935)
          * http://www.dotvoid.com/2009/10/problem-with-downloading-files-with-internet-explorer-over-https/
          */
-        if(isset($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"] == "on")){
+        if(isset($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"] == "on")) {
             header('Pragma: ');
             //header('Pragma: public');
         }
@@ -252,29 +284,33 @@ class SecuredFileController extends Controller {
         session_write_close();
 
         /**
-        * if output buffering is active, we clear it to prevent the script from trying to to allocate memory for entire file.
-        * 
-        * trying to clean each buffer before read the file to the buffer, there are lots of  problem of
-        * HP "Output Controll", depanding on php version,  .ini settings, libs added, etc.
-        *
-        * On different php version, i.e. 5.3 and 5.4 make  ob_start() differently and hence ob_flush(), ob_clean(), ob_end_clean(), 
-        * ob_end_flush() could be sometimes working and sometime snot, depending on how ob_start(), besides ob_flush() are not
-        * stable and bugs being new introduced to the function in 5.4.
-        * We found the most relable function is ob_end_clean();
-        *
-        * TODO: dealing with clearing buffers using combinatioin of ob_get_status() and phpversion()
-        */
+         * if output buffering is active, we clear it to prevent the script from trying to to allocate memory for entire file.
+         * 
+         * trying to clean each buffer before read the file to the buffer, there are lots of  problem of
+         * HP "Output Controll", depanding on php version,  .ini settings, libs added, etc.
+         *
+         * On different php version, i.e. 5.3 and 5.4 make  ob_start() differently and hence ob_flush(), ob_clean(), ob_end_clean(), 
+         * ob_end_flush() could be sometimes working and sometimes not, depending on how ob_start(), besides ob_flush() are not
+         * stable and bugs being new introduced to the function in 5.4.
+         * We found the most relable function is ob_end_clean();
+         *
+         * TODO: dealing with clearing buffers using combinatioin of ob_get_status() and phpversion()
+         */
         while (ob_get_level() > 0) {
             ob_end_clean();
         }
         flush();
         readfile($path);
 
-        //exit the script
         exit(0);
     }
 
-    public function sendFileToBrowser($file){
+    /**
+     * 
+     * @param File $file
+     * @return void
+     */
+    public function sendFileToBrowser($file) {
         $path = $file->getFullPath();
         if(SapphireTest::is_running_test()) {
             return file_get_contents($path);
@@ -290,6 +326,7 @@ class SecuredFileController extends Controller {
         } else {
             increase_time_limit_to();
         }
+        
         // send header
         header('Content-Description: File Transfer');
 
@@ -308,9 +345,8 @@ class SecuredFileController extends Controller {
          * issue fixes for IE6,7,8  when downloading a file over HTTPS (http://support.microsoft.com/kb/812935)
          * http://www.dotvoid.com/2009/10/problem-with-downloading-files-with-internet-explorer-over-https/
          */
-        if(isset($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"] == "on")){
+        if(isset($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"] == "on")) {
             header('Pragma: ');
-            //header('Pragma: public');
         }
 
         header('Expires: 0');
@@ -329,7 +365,6 @@ class SecuredFileController extends Controller {
         flush();
         readfile($path);
 
-        //exit the script
         exit(0);
     }
     
@@ -339,27 +374,16 @@ class SecuredFileController extends Controller {
      * @return boolean
      */
     public function canSendToBrowser(File $file = null) {
-
-        //if backend, return true
-        /*$referer = $this->request->getHeader("Referer");
-        if($referer) {
-            $parse_url = parse_url($referer);
-            if(isset($parse_url['path']) && $parse_url['path']){
-                if(strpos($parse_url['path'], '/admin/')===0){
-                    return true;
-                }
-            }
-        }*/
         $canViewFront = true;
         if($file instanceof File) {
             // Implement all file extensions with canViewFront()
             $cans = $file->extend('canViewFront');
             if($cans && is_array($cans)) {
                 foreach($cans as $can) $canViewFront = $can && $canViewFront;
-            }else{
+            } else {
                 $canViewFront = false;
             }
-        }else{
+        } else {
             $canViewFront = false;
         }
 

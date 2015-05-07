@@ -1,12 +1,12 @@
 <?php
 /**
- * Author: Normann
- * Date: 3/11/2014
- * Time: 12:40 PM
+ * 
+ * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
+ * @package silverstripe-advancedassets
  */
-
 class SecuredFilesContentController extends Extension {
-    function onAfterInit(){
-        Requirements::javascript(SECURED_FILES_MODULE."/javascript/ContentControllerContainingSecuredFiles.js");
+    
+    public function onAfterInit() {
+        Requirements::javascript(SECURED_FILES_MODULE_DIR . "/javascript/ContentControllerContainingSecuredFiles.js");
     }
 }

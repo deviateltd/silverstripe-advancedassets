@@ -1,18 +1,24 @@
 <?php
 /**
- * Author: Normann
- * Date: 14/08/14
- * Time: 2:42 PM
  *
- * This extension is only add 2 customisd function for Folder object
+ * This extension only adds x2 customised methods for Folder object:
+ * 
  * {@link FolderSecured::securedSyncChildren()} is a customised version of {@link Folder::syncChildren()}
  * with two places of overwritten marked as @customised
  * {@Link FolderSecured::constructChildSecuredWithSecuredFlag is a customised version of
- * {@link Folder::constructChild()} which also populate the File's "Secured" field
+ * {@link Folder::constructChild()} which also populates the File's "Secured" field
+ * 
+ * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
+ * @package silverstripe-advancedassets
+ * @todo How many of the "cloned" methods/props from {@link Folder} are actually neeed?
  */
-
 class FolderSecured extends DataExtension {
-    function securedSyncChildren(){
+    
+    /**
+     * 
+     * @return array
+     */
+    public function securedSyncChildren() {
         $parentID = (int)$this->owner->ID; // parentID = 0 on the singleton, used as the 'root node';
         $added = 0;
         $deleted = 0;
@@ -20,34 +26,36 @@ class FolderSecured extends DataExtension {
 
         // First, merge any children that are duplicates
         //customised
-        if($parentID === 0){
+        if($parentID === 0) {
             //make sure there is no merges between a secured folder and non secured folder.
             //there is only one case that there are both secured child folder and non-secured child folder exists,
             //that is when $this->owner is on assets root.
             $duplicateChildrenNames = DB::query("SELECT \"Name\" FROM \"File\""
                 ." WHERE \"ParentID\"=$parentID AND \"Secured\"='0' GROUP BY \"Name\" HAVING count(*) > 1")->column();
-        }else{
+        } else {
             $duplicateChildrenNames = DB::query("SELECT \"Name\" FROM \"File\""
                 . " WHERE \"ParentID\" = $parentID GROUP BY \"Name\" HAVING count(*) > 1")->column();
         }
-        if($duplicateChildrenNames) foreach($duplicateChildrenNames as $childName) {
-            $childName = Convert::raw2sql($childName);
-            // Note, we do this in the database rather than object-model; otherwise we get all sorts of problems
-            // about deleting files
-            $children = DB::query("SELECT \"ID\" FROM \"File\""
-                . " WHERE \"Name\" = '$childName' AND \"ParentID\" = $parentID")->column();
-            if($children) {
-                $keptChild = array_shift($children);
-                foreach($children as $removedChild) {
-                    DB::query("UPDATE \"File\" SET \"ParentID\" = $keptChild WHERE \"ParentID\" = $removedChild");
-                    DB::query("DELETE FROM \"File\" WHERE \"ID\" = $removedChild");
+        
+        if($duplicateChildrenNames) {
+            foreach($duplicateChildrenNames as $childName) {
+                $childName = Convert::raw2sql($childName);
+                // Note, we do this in the database rather than object-model; otherwise we get all sorts of problems
+                // about deleting files
+                $children = DB::query("SELECT \"ID\" FROM \"File\""
+                    . " WHERE \"Name\" = '$childName' AND \"ParentID\" = $parentID")->column();
+                if($children) {
+                    $keptChild = array_shift($children);
+                    foreach($children as $removedChild) {
+                        DB::query("UPDATE \"File\" SET \"ParentID\" = $keptChild WHERE \"ParentID\" = $removedChild");
+                        DB::query("DELETE FROM \"File\" WHERE \"ID\" = $removedChild");
+                    }
+                } else {
+                    user_error("Inconsistent database issue: SELECT ID FROM \"File\" WHERE Name = '$childName'"
+                        . " AND ParentID = $parentID should have returned data", E_USER_WARNING);
                 }
-            } else {
-                user_error("Inconsistent database issue: SELECT ID FROM \"File\" WHERE Name = '$childName'"
-                    . " AND ParentID = $parentID should have returned data", E_USER_WARNING);
             }
         }
-
 
         // Get index of database content
         // We don't use DataObject so that things like subsites doesn't muck with this.
@@ -96,7 +104,6 @@ class FolderSecured extends DataExtension {
                     }
                 }
 
-
                 // A record with a bad class type doesn't deserve to exist. It must be purged!
                 if(isset($hasDbChild[$actualChild])) {
                     $child = $hasDbChild[$actualChild];
@@ -107,7 +114,6 @@ class FolderSecured extends DataExtension {
                     }
                 }
 
-
                 if(isset($hasDbChild[$actualChild])) {
                     $child = $hasDbChild[$actualChild];
                     unset($unwantedDbChildren[$actualChild]);
@@ -117,14 +123,14 @@ class FolderSecured extends DataExtension {
                     $child = DataObject::get_by_id("File", $childID);
                 }
 
-                if( $child && is_dir($baseDir . $actualChild)) {
+                if($child && is_dir($baseDir . $actualChild)) {
                     //customised
                     //when we synch on assets root
                     //we don't want to sync the secured root folder _securedfiles
                     //This is only the case where both secured child folder and non-secured child folder exist
-                    if($parentID === 0 && $child->ID === FileSecured::getSecuredRoot()->ID){
+                    if($parentID === 0 && $child->ID === FileSecured::getSecuredRoot()->ID) {
                         $skipped ++;
-                    }else{
+                    } else {
                         //customised
                         //Of cause, we need to call this customised version recursively
                         $childResult = $child->securedSyncChildren();
@@ -156,7 +162,7 @@ class FolderSecured extends DataExtension {
         );
     }
 
-    function constructChildSecuredWithSecuredFlag($name){
+    public function constructChildSecuredWithSecuredFlag($name) {
         // Determine the class name - File, Folder or Image
         $baseDir = $this->owner->FullPath;
         if(is_dir($baseDir . $name)) {

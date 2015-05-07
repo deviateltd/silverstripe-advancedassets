@@ -1,6 +1,6 @@
 # SilverStripe Advanced Assets
 
-Provides a secure Files admin area in the CMS in parallel with the CMS' standard
+Provides an additional Files admin area in the CMS in parallel with the CMS' standard
 Files admin area.
 
 ## Features

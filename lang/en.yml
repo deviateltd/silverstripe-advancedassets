@@ -4,4 +4,3 @@ en:
       ERROR_ACCESS_ONLY_IN_FILES: 'This folder is only accessible via the "Files" admin.'
       ERROR_ACCESS_ONLY_IN_SECURED_FILES: 'This folder is only accessible via the "Secured Files" admin.'
       ERROR_FOLDER_NOT_EXISTS: "The selected folder doesn't exist"
-        

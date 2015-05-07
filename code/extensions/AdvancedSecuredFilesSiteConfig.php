@@ -1,15 +1,16 @@
 <?php
 /**
- * Author: Normann
- * Date: 29/10/2014
- * Time: 12:16 PM
+ * 
+ * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
+ * @package silverstripe-advancedassets
  */
-
-class AdvancedSecuredFilesSiteConfig extends DataExtension{
+class AdvancedSecuredFilesSiteConfig extends DataExtension {
+    
     private static $db = array(
         "SecuredFileDefaultTitle"   => "Varchar",
         "SecuredFileDefaultContent" => "HTMLText",
     );
+    
     private static $has_one = array(
         "LockpadImageNeedLogIn"     => "Image",
         "LockpadImageNoAccess"      => "Image",
@@ -17,6 +18,11 @@ class AdvancedSecuredFilesSiteConfig extends DataExtension{
         "LockpadImageNotYetAvailable"   => "Image",
     );
 
+    /**
+     * 
+     * @param FieldList $fields
+     * @return void
+     */
     public function updateCMSFields(FieldList $fields){
         $fields->addFieldsToTab("Root.SecuredFiles", array(
             UploadField::create('LockpadImageNeedLogIn', 'Lockpad image that shows "need to login"')

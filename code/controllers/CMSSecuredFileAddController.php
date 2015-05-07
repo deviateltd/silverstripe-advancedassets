@@ -1,9 +1,8 @@
 <?php
 /**
- * Author: Normann
- * Date: 13/08/14
- * Time: 11:15 AM
  * 
+ * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
+ * @package silverstripe-advancedassets
  * @todo Modify addFolder() and initValidate() to show messages within the CMS.
  */
 class CMSSecuredFileAddController extends CMSFileAddController{
@@ -13,9 +12,6 @@ class CMSSecuredFileAddController extends CMSFileAddController{
     private static $required_permission_codes = 'CMS_ACCESS_SecuredAssetAdmin';
     private static $menu_title = 'Secured Files';
     private static $tree_class = 'Folder';
-    /**
-     * Custom currentPage() method to handle opening the 'root' folder
-     */
 
     public function init(){
         parent::init();
@@ -45,6 +41,12 @@ class CMSSecuredFileAddController extends CMSFileAddController{
         }
     }
 
+    /**
+     * 
+     * Custom currentPage() method to handle opening the 'root' folder.
+     * 
+     * @return Folder
+     */
     public function currentPage() {
         $id = $this->currentPageID();
         if($id && is_numeric($id) && $id > 0) {
@@ -52,7 +54,7 @@ class CMSSecuredFileAddController extends CMSFileAddController{
             if($folder && $folder->exists()) {
                 return $folder;
             }
-        }else{
+        } else {
             SecuredAssetAdmin::instantiate();
             $root = FileSecured::getSecuredRoot();
             if($root && $root->exists()) return $root;
@@ -61,7 +63,10 @@ class CMSSecuredFileAddController extends CMSFileAddController{
     }
 
     /**
+     * 
      * Return fake-ID "root" if no ID is found (needed to upload files into the root-folder)
+     * 
+     * @return mixed (string | number)
      */
     public function currentPageID() {
         if(is_numeric($this->request->requestVar('ID')))	{
@@ -82,8 +87,9 @@ class CMSSecuredFileAddController extends CMSFileAddController{
     }
 
     /**
-     * @param null $id Not used.
-     * @param null $fields Not used.
+     * 
+     * @param number $id Not used.
+     * @param FieldList $fields Not used.
      * @return Form
      * @todo what template is used here? AssetAdmin_UploadContent.ss doesn't seem to be used anymore
      */
@@ -104,6 +110,11 @@ class CMSSecuredFileAddController extends CMSFileAddController{
         return $form;
     }
 
+    /**
+     * 
+     * @param boolean $unlinked
+     * @return ArrayList
+     */
     public function Breadcrumbs($unlinked = false) {
         $itemsDefault = parent::Breadcrumbs($unlinked);
         $items = new ArrayList();

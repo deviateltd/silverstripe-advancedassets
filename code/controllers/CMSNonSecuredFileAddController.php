@@ -1,9 +1,8 @@
 <?php
 /**
- * Author: Normann
- * Date: 13/08/14
- * Time: 2:38 PM
  * 
+ * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
+ * @package silverstripe-advancedassets
  * @todo Modify addFolder() and initValidate() to show messages within the CMS.
  */
 class CMSNonSecuredFileAddController extends CMSFileAddController{
