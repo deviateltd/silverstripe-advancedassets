@@ -5,7 +5,7 @@
  * @package silverstripe-advancedassets
  * @todo Modify addFolder() and initValidate() to show messages within the CMS.
  */
-class NonSecuredAssetAdmin extends AssetAdmin{
+class NonSecuredAssetAdmin extends AssetAdmin {
     
     private static $menu_priority = 5;
 
@@ -42,16 +42,28 @@ class NonSecuredAssetAdmin extends AssetAdmin{
         }
     }
 
+    /**
+     * 
+     * @return SS_List
+     */
     public function getList(){
         $list = parent::getList();
         $list = $list->exclude("Secured", "1");
         return $list;
     }
 
+    /**
+     * 
+     * @return SS_List
+     */
     public function SiteTreeAsUL() {
         return $this->getSiteTreeFor($this->stat('tree_class'), null, 'ChildFoldersExcludeSecured');
     }
 
+    /**
+     * 
+     * @return array
+     */
     public function Breadcrumbs($unlinked = false) {
         $items = parent::Breadcrumbs($unlinked);
         if(isset($items[0]->Title)){
@@ -59,9 +71,12 @@ class NonSecuredAssetAdmin extends AssetAdmin{
         }
         return $items;
     }
+    
     /**
      * Can be queried with an ajax request to trigger the filesystem sync. It returns a FormResponse status message
      * to display in the CMS
+     * 
+     * @return null
      */
     public function doSync() {
         $message = SecuredFilesystem::sync_secured();
@@ -72,7 +87,8 @@ class NonSecuredAssetAdmin extends AssetAdmin{
 
     /**
      * 
-     * @inheritdoc
+     * {@inheritdoc}
+     * 
      * @param SS_HTTPRequest $request
      * @return HTMLText
      */

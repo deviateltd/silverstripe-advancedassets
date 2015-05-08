@@ -15,7 +15,7 @@ class SecuredFilesystem extends Filesystem {
     /**
      * 
      * @param number $folderID
-     * @return type
+     * @return string
      */
     public static function sync_secured($folderID = null) {
         $folder = DataObject::get_by_id('Folder', (int) $folderID);
@@ -38,6 +38,7 @@ class SecuredFilesystem extends Filesystem {
                 unset($file);
             }
         }
+        
         return _t(
             'Filesystem.SYNCRESULTS',
             'Sync complete: {createdcount} items created, {deletedcount} items deleted',

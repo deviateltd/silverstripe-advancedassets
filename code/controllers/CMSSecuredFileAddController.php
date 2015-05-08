@@ -5,7 +5,7 @@
  * @package silverstripe-advancedassets
  * @todo Modify addFolder() and initValidate() to show messages within the CMS.
  */
-class CMSSecuredFileAddController extends CMSFileAddController{
+class CMSSecuredFileAddController extends CMSFileAddController {
     
     private static $url_segment = 'assets-secured/add';
     private static $url_priority = 65;
@@ -107,6 +107,7 @@ class CMSSecuredFileAddController extends CMSFileAddController{
         $fields = $form->Fields();
         $fields->removeByName("BackLink");
         $fields->push($backLink);
+        
         return $form;
     }
 

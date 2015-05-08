@@ -10,111 +10,141 @@ class SecuredFileRichLinksExtension extends Extension {
     private static $casting = array(
         'SecuredFileRichLinks' => 'HTMLText'
     );
+    
+    /**
+     *
+     * @var string
+     */
+    public $_need_login_image;
+    
+    /**
+     *
+     * @var string
+     */
+    public $_no_access_image;
+    
+    /**
+     *
+     * @var string
+     */
+    public $_no_longer_image;
+    
+    /**
+     *
+     * @var string
+     */
+    public $_not_yet_image;
 
     /**
      * 
      * @param File $file
      * @param Config $config
      * @return type
+     * @todo ...umm refactor?
      */
     public function getDefaultPadlockImagePathByConfig($file, $config) {
-        if($file->isExpired() ){
-            if(!$this->_no_longer_image){
+        if($file->isExpired() ) {
+            if(!$this->_no_longer_image) {
                 $lockpadImage = $config->LockpadImageNoLongerAvailable();
-                if(!$lockpadImage || !$lockpadImage->exists()){
+                if(!$lockpadImage || !$lockpadImage->exists()) {
                     if($file->isEmbargoed()) {
-                        if(!$this->_not_yet_image){
+                        if(!$this->_not_yet_image) {
                             $lockpadImage = $config->LockpadImageNotYetAvailable();
                             if(!$lockpadImage || !$lockpadImage->exists()) {
-                                if(!$this->_no_access_image){
+                                if(!$this->_no_access_image) {
                                     $lockpadImage = $config->LockpadImageNoAccess();
-                                    if($lockpadImage && $lockpadImage->exists()){
+                                    if($lockpadImage && $lockpadImage->exists()) {
                                         $this->_no_access_image = $lockpadImage->Filename;
                                         return $this->_no_access_image;
                                     }
-                                }else{
+                                } else {
                                     return $this->_no_access_image;
                                 }
 
-                            }else{
+                            } else {
                                 $this->_not_yet_image = $lockpadImage->Filename;
                                 return $this->_not_yet_image;
                             }
-                        }else{
+                        } else {
                             return $this->_not_yet_image;
                         }
                     }
-                }else{
+                } else {
                     $this->_no_longer_image = $lockpadImage->Filename;
                     return $this->_no_longer_image;
                 }
-            }else{
+            } else {
                 return $this->_no_longer_image;
             }
-        }else if($file->isEmbargoed()){
-            if(!$this->_not_yet_image){
+        } else if($file->isEmbargoed()) {
+            if(!$this->_not_yet_image) {
                 $lockpadImage = $config->LockpadImageNotYetAvailable();
-                if(!$lockpadImage || !$lockpadImage->exists()){
+                if(!$lockpadImage || !$lockpadImage->exists()) {
                     if($file->isExpired()) {
-                        if(!$this->_no_longer_image){
+                        if(!$this->_no_longer_image) {
                             $lockpadImage = $config->LockpadImageNoLongerAvailable();
                             if(!$lockpadImage || !$lockpadImage->exists()) {
-                                if(!$this->_no_access_image){
+                                if(!$this->_no_access_image) {
                                     $lockpadImage = $config->LockpadImageNoAccess();
-                                    if($lockpadImage && $lockpadImage->exists()){
+                                    if($lockpadImage && $lockpadImage->exists()) {
                                         $this->_no_access_image = $lockpadImage->Filename;
                                         return $this->_no_access_image;
                                     }
-                                }else{
+                                } else {
                                     return $this->_no_access_image;
                                 }
 
-                            }else{
+                            } else {
                                 $this->_no_longer_image = $lockpadImage->Filename;
                                 return $this->_no_longer_image;
                             }
-                        }else{
+                        } else {
                             return $this->_no_longer_image;
                         }
                     }
-                }else{
+                } else {
                     $this->_not_yet_image = $lockpadImage->Filename;
                     return $this->_not_yet_image;
                 }
-            }else{
+            } else {
                 return $this->_not_yet_image;
             }
-        }else{
-            if(!$this->_no_access_image){
+        } else {
+            if(!$this->_no_access_image) {
                 $lockpadImage = $config->LockpadImageNoAccess();
-                if($lockpadImage && $lockpadImage->exists()){
+                if($lockpadImage && $lockpadImage->exists()) {
                     $this->_no_access_image = $lockpadImage->Filename;
                     return $this->_no_access_image;
                 }
-            }else{
+            } else {
                 return $this->_no_access_image;
             }
         }
     }
 
-    public $_need_login_image;
-    public $_no_access_image;
-    public $_no_longer_image;
-    public $_not_yet_image;
-
-    public function getDefaultPadlockLoginImagePathByConfig($config){
-        if(!$this->_need_login_image){
+    /**
+     * 
+     * @param Config $config
+     * @return string
+     */
+    public function getDefaultPadlockLoginImagePathByConfig($config) {
+        if(!$this->_need_login_image) {
             $lockpadImage = $config->LockpadImageNeedLogIn();
-            if($lockpadImage && $lockpadImage->exists()){
+            if($lockpadImage && $lockpadImage->exists()) {
                 $this->_need_login_image = $lockpadImage->Filename;
                 return $this->_need_login_image;
             }
-        }else{
+        } else {
             return $this->_need_login_image;
         }
     }
 
-    public function getDefaultPadlockImagePath($image){
+    /**
+     * 
+     * @param Image $image
+     * @return string
+     */
+    public function getDefaultPadlockImagePath($image) {
         $originalFilePath = $image->getFullPath();
         if(file_exists($originalFilePath)) {
             $originalFileSize = filesize($originalFilePath);
@@ -132,7 +162,11 @@ class SecuredFileRichLinksExtension extends Extension {
         return $src = ASSETS_DIR . DIRECTORY_SEPARATOR . "_defaultlockimages" . DIRECTORY_SEPARATOR . $name ;
     }
 
-    function SecuredFileRichLinks(){
+    /**
+     * 
+     * @return string
+     */
+    public function SecuredFileRichLinks() {
         // Note:
         // Assume we can use Regexes because the link will always be formatted
         // in the same way coming from the CMS.
@@ -145,7 +179,7 @@ class SecuredFileRichLinksExtension extends Extension {
 
         //make replacement images ready
         $config = SiteConfig::current_site_config();
-        for ($i = 0; $i < count($imatches[0]); $i++){
+        for($i = 0; $i < count($imatches[0]); $i++) {
             $image = DataObject::get_one('Image', "\"Filename\" = '".Convert::raw2sql($imatches[2][$i])."'");
             if($image && $image->exists() && $image->Secured) {
                 $icanViewByTime = $image->canViewFrontByTime();
@@ -154,31 +188,31 @@ class SecuredFileRichLinksExtension extends Extension {
                 if($icanViewByTime && $icanViewByUser) {
                     $class = $imatches[1][$i];
                     $replaceNeeded = false;
-                }else if(!$icanViewByTime) {
+                } else if(!$icanViewByTime) {
                     $class = $imatches[1][$i];
                     if($class) $class .= " secured unavailable";
                     else $class = "secured unavailable";
                     $replaceNeeded = true;
-                }else { // $canViewByUser is false only
+                } else { // $canViewByUser is false only
                     $class = $imatches[1][$i];
                     if($class) $class .= " secured";
                     else $class = "secured";
                     $replaceNeeded = true;
                 }
 
-                if($replaceNeeded){
+                if($replaceNeeded) {
                     $member = Member::currentUser();
-                    if($member && $member->exists()){
+                    if($member && $member->exists()) {
                         $src = $this->getDefaultPadlockImagePathByConfig($image, $config);
-                    }else{
-                        if(!$icanViewByTime){
+                    } else {
+                        if(!$icanViewByTime) {
                             $src = $this->getDefaultPadlockImagePathByConfig($image, $config);
-                        }else{
+                        } else {
                             $src = $this->getDefaultPadlockLoginImagePathByConfig($config);
                         }
                     }
 
-                    if(!$src){
+                    if(!$src) {
                         $src = $this->getDefaultPadlockImagePath($image);
                     }
 
@@ -192,12 +226,13 @@ class SecuredFileRichLinksExtension extends Extension {
                 }
             }
         }
+        
         // Find all file links for processing.
         preg_match_all('/<a.*href="\[file_link,id=([0-9]+)\].*".*>.*<\/a>/U', $content, $matches);
         // Attach the file type and size to each of the links.
-        for ($i = 0; $i < count($matches[0]); $i++){
+        for($i = 0; $i < count($matches[0]); $i++) {
             $file = DataObject::get_by_id('File', $matches[1][$i]);
-            if ($file && $file->exists() && $file->Secured) {
+            if($file && $file->exists() && $file->Secured) {
                 $size = $file->getSize();
                 $ext = strtoupper($file->getExtension());
                 $canViewByTime = $file->canViewFrontByTime();
@@ -205,26 +240,29 @@ class SecuredFileRichLinksExtension extends Extension {
 
                 if($canViewByTime && $canViewByUser) {
                     $class = "";
-                }else if(!$canViewByTime) {
+                } else if(!$canViewByTime) {
                     $class = "secured unavailable";
-                }else { // $canViewByUser is false only
+                } else { // $canViewByUser is false only
                     $class = "secured";
                 }
 
-                if($class !== ""){
+                if($class !== "") {
                     $newLink = "<a class=\"".$class."\" ".substr($matches[0][$i], 2);
                     if(!$canViewByTime) {
                         $newLink = str_replace(array("<a"," target=\"_blank\"","href", "</a>"), array("<span","","data-file-link","</span>"), $newLink);
                     }
-                }else{
+                } else {
                     $newLink = $matches[0][$i];
                 }
+                
                 $newLink = $newLink."<span class='fileExt'> [$ext, $size]</span>";
                 $originals[] = $matches[0][$i];
                 $replacements[] = $newLink;
             }
         }
-        if(!empty($originals)) $content = str_replace($originals, $replacements, $content);
+        if(!empty($originals)) {
+            $content = str_replace($originals, $replacements, $content);
+        }
 
         // Inject extra attributes into the external links.
         $pattern = '/(<a.*)(href=\"https?:\/\/[^\"]*\"[^>]*>.*)(<\/a>)/iU';

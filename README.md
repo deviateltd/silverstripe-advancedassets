@@ -1,7 +1,7 @@
 # SilverStripe Advanced Assets
 
 Provides an additional Files admin area in the CMS in parallel with the CMS' standard
-Files admin area.
+Files admin area, that allows for some more "advanced" file and folder options.
 
 ## Features
 
@@ -40,7 +40,3 @@ Add a new block under the "repositories" block:
       }
 
 Now run `dev/build` via the browser or command line - and don't forget to flush.
-
-## Usage
-
-TODO

@@ -1,0 +1,34 @@
+# Test Members+Groups
+Member:
+  can-view-secured-files:
+    FirstName: Big
+    Surname: 'Bad Wolf'
+    Email: big.bad.wolf@munchgranny.nz
+    Password: test
+  can-view-unsecured-files-only:
+    FirstName: Big
+    Surname: 'Friendly Giant'
+    Email: bfg@largehumanoid.nz
+    Password: test
+    
+Group:
+  can-view:
+    Code: can-view
+    Members: =>Member.can-view-secured-files
+  cannot-view:
+    Code: cannot-view
+    Members: =>Member.can-view-unsecured-files-only
+    
+Permission:
+  secured-01:
+    Code: ADMIN
+    Group: =>Group.can-view
+  secured-02:
+    Code: CMS_ACCESS_SecuredAssetAdmin
+    Group: =>Group.can-view
+  secured-02:
+    Code: SECURED_FILES_VIEW_ALL
+    Group: =>Group.can-view
+  not-secured-01:
+    Code: CMS_ACCESS_AssetAdmin
+    Group: =>Group.cannot-view

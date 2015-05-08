@@ -6,6 +6,11 @@
  */
 class SecuredFilesHtmlEditorField_Toolbar extends Extension {
     
+    /**
+     * 
+     * @param Form $form
+     * @return void
+     */
     public function updateMediaForm(Form $form) {
         $fields = $form->Fields();
         $parentIDField = $fields->dataFieldByName('ParentID');
