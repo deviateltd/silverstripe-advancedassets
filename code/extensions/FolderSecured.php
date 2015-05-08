@@ -16,6 +16,8 @@ class FolderSecured extends DataExtension {
     
     /**
      * 
+     * "Secure" version of {@link Folder::SyncChildren}.
+     * 
      * @return array
      */
     public function securedSyncChildren() {
@@ -27,7 +29,7 @@ class FolderSecured extends DataExtension {
         // First, merge any children that are duplicates
         //customised
         if($parentID === 0) {
-            //make sure there is no merges between a secured folder and non secured folder.
+            //make sure there are no merges between a secured folder and non-secured folder.
             //there is only one case that there are both secured child folder and non-secured child folder exists,
             //that is when $this->owner is on assets root.
             $duplicateChildrenNames = DB::query("SELECT \"Name\" FROM \"File\""
@@ -74,7 +76,9 @@ class FolderSecured extends DataExtension {
         // if we're syncing a folder with no ID, we assume we're syncing the root assets folder
         // however the Filename field is populated with "NewFolder", so we need to set this to empty
         // to satisfy the baseDir variable below, which is the root folder to scan for new files in
-        if(!$parentID) $this->owner->Filename = '';
+        if(!$parentID) {
+            $this->owner->Filename = '';
+        }
 
         // Iterate through the actual children, correcting the database as necessary
         $baseDir = $this->owner->FullPath;
@@ -92,14 +96,12 @@ class FolderSecured extends DataExtension {
                     foreach($ignoreRules as $rule) {
                         if(preg_match($rule, $actualChild)) {
                             $skip = true;
-
                             break;
                         }
                     }
 
                     if($skip) {
                         $skipped++;
-
                         continue;
                     }
                 }
@@ -162,6 +164,11 @@ class FolderSecured extends DataExtension {
         );
     }
 
+    /**
+     * 
+     * @param string $name
+     * @return number
+     */
     public function constructChildSecuredWithSecuredFlag($name) {
         // Determine the class name - File, Folder or Image
         $baseDir = $this->owner->FullPath;
@@ -171,11 +178,15 @@ class FolderSecured extends DataExtension {
             $className = File::get_class_for_file_extension(pathinfo($name, PATHINFO_EXTENSION));
         }
 
-        if(Member::currentUser()) $ownerID = Member::currentUser()->ID;
-        else $ownerID = 0;
+        $ownerID = 0;
+        if(Member::currentUser()) {
+            $ownerID = Member::currentUser()->ID;
+        }
 
         $filename = Convert::raw2sql($this->owner->Filename . $name);
-        if($className == 'Folder' ) $filename .= '/';
+        if($className == 'Folder' ) {
+            $filename .= '/';
+        }
 
         $name = Convert::raw2sql($name);
         $secured = $this->owner->Secured?'1':'0';

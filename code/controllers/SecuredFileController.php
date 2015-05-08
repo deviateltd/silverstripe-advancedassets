@@ -8,6 +8,18 @@
 class SecuredFileController extends Controller {
     
     /**
+     * We calculate the timelimit based on the filesize. Set to 0 to give unlimited timelimit.
+     * The calculation is: give enough time for the user with x kB/s connection to donwload the entire file.
+     * E.g. The default 50kB/s equates to 348 minutes per 1GB file.
+     * 
+     * Depending on the network bandwidth, the script execution time might need to be prolonged if the requested file
+     * is big, we use the threshold to calculate how long we want to prolong, default as 10,240 bits / second
+     * 
+     * @var number
+     */
+    private static $bandwidth_threshold = 10240;
+    
+    /**
      * Handle the requests, checking the request file is downloadable
      * 
      * @param SS_HTTPRequest $request
@@ -49,7 +61,7 @@ class SecuredFileController extends Controller {
             } else {
                 if($file instanceof Image) {
                     $this->sendLockpadSamepleImageToBrowser($file);
-                }else{
+                } else {
                     $this->treatFileAccordingToStatus($file);
                 }
             }
@@ -65,11 +77,11 @@ class SecuredFileController extends Controller {
         $member = Member::currentUser();
         if($member && $member->exists()) {
             $this->notAccessible();
-        }else{
+        } else {
             $canViewByTime = $file->canViewFrontByTime();
             if(!$canViewByTime) {
                 $this->notAccessible();
-            }else{
+            } else {
                 $this->redirectToLogIn();
             }
         }
@@ -127,15 +139,6 @@ class SecuredFileController extends Controller {
         
         exit(0);
     }
-
-    // We calculate the timelimit based on the filesize. Set to 0 to give unlimited timelimit.
-    // The calculation is: give enough time for the user with x kB/s connection to donwload the entire file.
-    // E.g. The default 50kB/s equates to 348 minutes per 1GB file.
-    /**
-     * depending on the network bandwidth, the script execution time might need to be prolonged if the requested file
-     * is big, we use the threshold to calculate how long we want to prolong, default as 10,240 bits / second
-     */
-    private static $bandwidth_threshold = 10240;
 
     /**
      * 
@@ -245,7 +248,7 @@ class SecuredFileController extends Controller {
         $type = HTTP::get_mime_type($relativePath);
 
         //handling time limitation
-        if ($threshold = $this->config()->bandwidth_threshold) {
+        if($threshold = $this->config()->bandwidth_threshold) {
             increase_time_limit_to((int)($length/$threshold));
         } else {
             increase_time_limit_to();
@@ -271,7 +274,6 @@ class SecuredFileController extends Controller {
          */
         if(isset($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"] == "on")) {
             header('Pragma: ');
-            //header('Pragma: public');
         }
 
         header('Expires: 0');
@@ -321,7 +323,7 @@ class SecuredFileController extends Controller {
         $type = HTTP::get_mime_type($file->getRelativePath());
 
         //handling time limitation
-        if ($threshold = $this->config()->bandwidth_threshold) {
+        if($threshold = $this->config()->bandwidth_threshold) {
             increase_time_limit_to((int)($length/$threshold));
         } else {
             increase_time_limit_to();

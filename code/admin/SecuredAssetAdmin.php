@@ -1,11 +1,17 @@
 <?php
 /**
  * 
+ * Creates a new folder on the F/S for uploading assets to ina secure manner by:
+ * 
+ * - Adding dynamically populate .htaccess and web.config files.
+ * - Use of canXX() methods on both child folders and files.
+ * 
  * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
  * @package silverstripe-advancedassets
+ * @see {@link FileSecured} and {@link FolderSecured}.
  * @todo Modify addFolder() and initValidate() to show messages within the CMS.
  */
-class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
+class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
     
     private static $url_segment = 'assets-secured';
     private static $url_rule = '/$Action/$ID';
@@ -48,16 +54,20 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
         }
     }
 
-    static function instantiate() {
+    /**
+     * 
+     * @return void
+     */
+    public static function instantiate() {
         $secured_root_folder = BASE_PATH . DIRECTORY_SEPARATOR .ASSETS_DIR . DIRECTORY_SEPARATOR . "_securedfiles";
-
         if(!is_dir($secured_root_folder)) {
             FileSecured::find_or_make_secured("_securedfiles/Uploads" );
         }
+        
         $resource_folder = BASE_PATH . DIRECTORY_SEPARATOR . SECURED_FILES_MODULE_DIR . DIRECTORY_SEPARATOR . 'resource';
-        $default_lock_images_foler = BASE_PATH . DIRECTORY_SEPARATOR .ASSETS_DIR . DIRECTORY_SEPARATOR . '_defaultlockimages';
-        if(!is_dir($default_lock_images_foler)) {
-            mkdir($default_lock_images_foler,
+        $default_lock_images_folder = BASE_PATH . DIRECTORY_SEPARATOR .ASSETS_DIR . DIRECTORY_SEPARATOR . '_defaultlockimages';
+        if(!is_dir($default_lock_images_folder)) {
+            mkdir($default_lock_images_folder,
                 Config::inst()->get('Filesystem', 'folder_create_mask')
             );
             $resource_images_folder = $resource_folder . DIRECTORY_SEPARATOR . 'images';
@@ -67,42 +77,18 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
                     continue;
                 }
                 copy($resource_images_folder. DIRECTORY_SEPARATOR . $entry,
-                    $default_lock_images_foler . DIRECTORY_SEPARATOR . $entry
+                    $default_lock_images_folder . DIRECTORY_SEPARATOR . $entry
                 );
             }
         }
-        /*if(!is_dir($secured_root_folder . DIRECTORY_SEPARATOR . "_defaultlockimages")) {
-            mkdir($secured_root_folder . DIRECTORY_SEPARATOR . "_defaultlockimages",
-                Config::inst()->get('Filesystem', 'folder_create_mask')
-            );
 
-            $resource_images_folder = $resource_folder . DIRECTORY_SEPARATOR . 'images';
-            $dir = dir($resource_images_folder);
-            while(false !== $entry = $dir->read()) {
-                // Skip pointers
-                if($entry == '.' || $entry == '..') {
-                    continue;
-                }
-                copy($resource_images_folder. DIRECTORY_SEPARATOR . $entry,
-                    $secured_root_folder . DIRECTORY_SEPARATOR . "_defaultlockimages" . DIRECTORY_SEPARATOR . $entry
-                );
-            }
-        }*/
-
-        if(!file_exists($secured_root_folder . DIRECTORY_SEPARATOR . '.htaccess')) {
-            $data = new ArrayData(array(
-                'base' => BASE_URL ? BASE_URL : '/',
-                'frameworkDir' => FRAMEWORK_DIR,
-            ));
-
-            $dothtaccess =  $data->renderWith($resource_folder . DIRECTORY_SEPARATOR . 'htaccess.ss');
-            $webconfig = $data->renderWith($resource_folder . DIRECTORY_SEPARATOR . 'webconfig.ss');
-
-            file_put_contents($secured_root_folder . DIRECTORY_SEPARATOR . '.htaccess', $dothtaccess->getValue());
-            file_put_contents($secured_root_folder . DIRECTORY_SEPARATOR . 'web.config', $webconfig->getValue());
-        }
+        self::write_config_files($secured_root_folder, $resource_folder);
     }
 
+    /**
+     * 
+     * @return SS_List
+     */
     public function getList() {
         $list = parent::getList();
         $list = $list->filter("Secured", 1);
@@ -112,7 +98,10 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
     }
 
     /**
+     * 
      * Return fake-ID "root" if no ID is found (needed to upload files into the root-folder)
+     * 
+     * @return number
      */
     public function currentPageID() {
         if(is_numeric($this->request->requestVar('ID')))	{
@@ -130,10 +119,15 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
                 $securedRoot = FileSecured::getSecuredRoot();
                 return $securedRoot->ID;
             }
-
         }
     }
 
+    /**
+     * 
+     * @param mumber $id
+     * @param FieldList $fields
+     * @return Form
+     */
     public function getEditForm($id = null, $fields = null) {
         if(!$id) $id=$this->currentPageID();
         $form = parent::getEditForm($id, $fields);
@@ -162,7 +156,7 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
         if($id == FileSecured::getSecuredRoot()->ID) {
             $form->Fields()->removeByName("DetailsView");
             $config->removeComponentsByType("GridFieldLevelup");
-        }else{
+        } else {
             $config->getComponentByType("GridFieldLevelup")->setLinkSpec('admin/'.self::$url_segment.'/show/%d');
         }
 
@@ -170,6 +164,7 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
         if($id == FileSecured::getSecuredRoot()->ID) {
             $form->Fields()->removeByName("DetailsView");
         }
+        
         //need to use CMSSecuredFileAddController, so update the "Upload" button.
         if($folder->canCreate()) {
             $uploadBtn = new LiteralField(
@@ -200,16 +195,22 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
                 }
             }
         }
+        
         return $form;
     }
 
+    /**
+     * 
+     * @return SS_List
+     */
     public function SiteTreeAsUL() {
         $root = FileSecured::getSecuredRoot();
         return $this->getSiteTreeFor($this->stat('tree_class'), $root->ID, 'ChildFoldersOnlySecured');
     }
 
     /**
-     * @param bool $unlinked
+     * 
+     * @param boolean $unlinked
      * @return ArrayList
      */
     public function Breadcrumbs($unlinked = false) {
@@ -226,9 +227,14 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
         if(isset($items[0]->Title)) {
             $items[0]->Title = _t("SECUREDASSETADMIN.SecuriedFiles", "Secured Files");
         }
+        
         return $items;
     }
 
+    /**
+     * 
+     * @return array
+     */
     public function providePermissions() {
         $title = _t("SECUREDASSETADMIN.MENUTITLE", LeftAndMain::menu_title_for_class($this->class));
         return array(
@@ -240,8 +246,11 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
     }
 
     /**
+     * 
      * Can be queried with an ajax request to trigger the filesystem sync. It returns a FormResponse status message
      * to display in the CMS
+     * 
+     * @return null
      */
     public function doSync() {
         $securedRoot = FileSecured::getSecuredRoot();
@@ -252,7 +261,8 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
     
     /**
      * 
-     * @inheritdoc
+     * {@inheritdoc}
+     * 
      * @param SS_HTTPRequest $request
      * @return HTMLText
      */
@@ -270,5 +280,29 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider{
             $message = _t('SecuredFilesystem.messages.ERROR_FOLDER_NOT_EXISTS');
             return SecuredFilesystem::show_access_message($this, $message);
         }        
+    }
+    
+    /**
+     * 
+     * Write web-server specific config files to the secured files, assets-sub directory.
+     * 
+     * @param string $folderSec
+     * @param string $folderRes
+     * @return void
+     */
+    public static function write_config_files($folderSec, $folderRes) {
+        // Take the dummy config files from the module's root dir, then populate and move
+        if(!file_exists($folderSec . DIRECTORY_SEPARATOR . '.htaccess')) {
+            $data = new ArrayData(array(
+                'base' => BASE_URL ? BASE_URL : '/',
+                'frameworkDir' => FRAMEWORK_DIR,
+            ));
+
+            $dotHtAaccess = $data->renderWith($folderRes . DIRECTORY_SEPARATOR . 'htaccess.ss');
+            $webDotConfig = $data->renderWith($folderRes . DIRECTORY_SEPARATOR . 'webconfig.ss');
+
+            file_put_contents($folderSec . DIRECTORY_SEPARATOR . '.htaccess', $dotHtAaccess->getValue());
+            file_put_contents($folderSec . DIRECTORY_SEPARATOR . 'web.config', $webDotConfig->getValue());
+        }
     }
 }
