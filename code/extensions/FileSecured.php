@@ -6,7 +6,7 @@
  * 
  * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
  * @package silverstripe-advancedassets
- * @todo How many of the "cloned" methods/props from {@link File} are actually neeed?
+ * @todo How many of the "cloned" methods/props from {@link File} are actually needed?
  * @todo Refactor canXX() methods to use bitwise logic to make checks far less fallible
  */
 class FileSecured extends DataExtension implements PermissionProvider {
@@ -35,6 +35,34 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * @var array
      */
     private static $cache_permissions = array();
+    
+    /**
+     * 
+     * @return string
+     */
+    private function showButtonsSecurity() {
+        $buttons = 
+            '<li class="ss-ui-button" data-panel="whocanview">Who Can View</li>' .
+            '<li class="ss-ui-button" data-panel="whocanedit">Who Can Edit</li>';
+
+        $componentEnabled = AdvancedAssetsFilesSiteConfig::is_security_enabled();
+        
+        return $componentEnabled ? $buttons : '';
+    }
+    
+    /**
+     * 
+     * @return string
+     */
+    private function showButtonsEmbargoexpiry() {
+        $buttons =
+            '<li class="ss-ui-button" data-panel="embargo">Embargo</li>' .
+            '<li class="ss-ui-button" data-panel="expiry">Expiry</li>';
+        
+        $componentEnabled = AdvancedAssetsFilesSiteConfig::is_embargoexpiry_enabled();
+        
+        return $componentEnabled ? $buttons : '';
+    }
 
     /**
      * 
@@ -58,11 +86,10 @@ class FileSecured extends DataExtension implements PermissionProvider {
             Requirements::css(SECURED_FILES_MODULE_DIR . "/css/SecuredFilesLeftAndMain.css");
             Requirements::javascript(SECURED_FILES_MODULE_DIR . "/javascript/SecuredFilesLeftAndMain.js");
 
-            $isFile = true;
             if(!is_a($this->owner,"Folder") && is_a($this->owner, "File")) {
-                $bottomTaskSelectionExtra =
-                    '<li class="ss-ui-button" data-panel="embargo">Embargo</li>'.
-                    '<li class="ss-ui-button" data-panel="expiry">Expiry</li>';
+                $buttonsEmbargoExpiry = $this->showButtonsSecurity();
+                $buttonsSecurity = $this->showButtonsEmbargoExpiry();
+                $isFile = true;
 
                 $embargoTypeField = new OptionSetField(
                     "EmbargoType", "",
@@ -93,18 +120,29 @@ class FileSecured extends DataExtension implements PermissionProvider {
                     ->setAttribute('readonly', true);
                 $expiryDatetime->getTimeField()->setAttribute('readonly', true);
             } else {
-                $bottomTaskSelectionExtra = "";
+                $buttonsEmbargoExpiry = '';
+                $buttonsSecurity = '';
                 $isFile = false;
             }
 
-            $fields->insertAfter(new LiteralField('BottomTaskSelection',
-                '<div id="Actions" class="field actions"><label class="left">Security Settings</label><ul>'.
-                $bottomTaskSelectionExtra.
-                '<li class="ss-ui-button" data-panel="whocanview">Who Can View</li>'.
-                '<li class="ss-ui-button" data-panel="whocanedit">Who Can Edit</li>'.
-                '</ul></div>'),
-                "ParentID"
+            // Only show this block if at one of the three components is enabled
+            $showAdvFields = (
+                    AdvancedAssetsFilesSiteConfig::is_security_enabled() ||
+                    AdvancedAssetsFilesSiteConfig::is_embargoexpiry_enabled()
             );
+            if($showAdvFields) {
+                $fields->insertAfter(new LiteralField('BottomTaskSelection',
+                    '<div id="Actions" class="field actions">'
+                        . '<label class="left">Advanced settings</label>'
+                        . '<ul>'
+                        . $buttonsEmbargoExpiry
+                        . $buttonsSecurity
+                        . '</ul>'
+                    . '</div>'
+                    ),
+                    "ParentID"
+                );
+            }
 
             if($isFile) {
                 $securitySettingsGroup = FieldGroup::create(
@@ -628,15 +666,15 @@ class FileSecured extends DataExtension implements PermissionProvider {
         return array(
             'SECURED_FILES_VIEW_ALL' => array(
                 'name' => _t('SecuredFiles.VIEW_ALL_DESCRIPTION', 'View any secured file'),
-                'category' => _t('Permissions.SECUREDFILES_CATEGORY', 'Secured files permissions'),
+                'category' => _t('Permissions.SECUREDFILES_CATEGORY', 'Advanced assets permissions'),
                 'sort' => -100,
-                'help' => _t('SecuredFiles.VIEW_ALL_HELP', 'Ability to view any secured files, regardless of the settings on the "Who can view" tab.  Requires the "Access to \'Secured Files\' section" permission')
+                'help' => _t('SecuredFiles.VIEW_ALL_HELP', 'Ability to view any advanced file, regardless of the settings on the "Who can view" tab. Requires the "Access to \'Advanced Files\' section" permission')
             ),
             'SECURED_FILES_EDIT_ALL' => array(
                 'name' => _t('SecuredFiles.EDIT_ALL_DESCRIPTION', 'Edit any secured file'),
-                'category' => _t('Permissions.SECUREDFILES_CATEGORY', 'Secured files permissions'),
+                'category' => _t('Permissions.SECUREDFILES_CATEGORY', 'Advanced files permissions'),
                 'sort' => -50,
-                'help' => _t('SecuredFiles.EDIT_ALL_HELP', 'Ability to edit any secured files, regardless of the settings on the "Who can edit" tab.  Requires the "Access to \'Secured Files\' section" permission')
+                'help' => _t('SecuredFiles.EDIT_ALL_HELP', 'Ability to edit any advanced file, regardless of the settings on the "Who can edit" tab.  Requires the "Access to \'Advanced Files\' section" permission')
             ),
         );
     }
@@ -808,9 +846,9 @@ class FileSecured extends DataExtension implements PermissionProvider {
     }
 
     /**
-     * Get the 'can edit' information for a number of secured files.
+     * Get the 'can edit' information for a number of advanced files.
      * 
-     * @param array $ids An array of IDs of the secured files to look up.
+     * @param array $ids An array of IDs of the advanced files to look up.
      * @param int $memberID ID of member.
      * @param bool $useCached Return values from the permission cache if they exist.
      * @return array

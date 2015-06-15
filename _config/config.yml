@@ -25,7 +25,7 @@ LeftAndMain:
     - SecuredFilesLeftAndMain
 SiteConfig:
   extensions:
-    - AdvancedSecuredFilesSiteConfig
+    - AdvancedAssetsFilesSiteConfig
 DBField:
   extensions:
     - SecuredFileRichLinksExtension
@@ -35,3 +35,4 @@ Controller:
 HtmlEditorField_Toolbar:
   extensions:
     - SecuredFilesHtmlEditorField_Toolbar
+    

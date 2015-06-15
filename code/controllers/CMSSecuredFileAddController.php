@@ -10,7 +10,7 @@ class CMSSecuredFileAddController extends CMSFileAddController {
     private static $url_segment = 'assets-secured/add';
     private static $url_priority = 65;
     private static $required_permission_codes = 'CMS_ACCESS_SecuredAssetAdmin';
-    private static $menu_title = 'Secured Files';
+    private static $menu_title = 'Advanced Assets';
     private static $tree_class = 'Folder';
 
     public function init(){
@@ -130,7 +130,7 @@ class CMSSecuredFileAddController extends CMSFileAddController {
             $i++;
         }
         if(isset($items[0]->Title)){
-            $items[0]->Title = _t("SECUREDASSETADMIN.SecuriedFiles", "Secured Files");
+            $items[0]->Title = _t("SECUREDASSETADMIN.SecuriedFiles", "Advanced Assets");
         }
         return $items;
     }
