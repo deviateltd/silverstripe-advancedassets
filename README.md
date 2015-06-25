@@ -1,14 +1,31 @@
 # SilverStripe Advanced Assets
 
 Provides an additional Files admin area in the CMS in parallel with the CMS' standard
-Files admin area, that allows for some more "advanced" file and folder options.
+Files admin area. It allows for some "advanced" file and folder features as follows:
 
 ## Features
 
- * Allows fine-grained access to files and folders using the CMS' standard security system
- * Allows individual access to the SecuredFiles CMS admin
- * Allows for embargo and expiry on individual files and folders
- * Integrates with the [Subsites module](http://addons.silverstripe.org/add-ons/silverstripe/subsites)
+ 1. Individual permissions to files and folders using the CMS' standard security system
+ 2. Embargo and expiry on individual files and folders
+ 3. Individual access to the Advanced Assets CMS admin
+ 4. Integrates with the [Subsites module](http://addons.silverstripe.org/add-ons/silverstripe/subsites)
+
+Note: 1. and 2. (above) need to be explicitly enabled. See the "Options" section below.
+
+## Compatibility
+
+If installed alongside the standard "Secured Files" module, the latter's features and access
+will be disabled.
+
+## Options
+
+The module's features have been broadly broken into 2 components; Embargo / Expiry and Security.
+Each of these components are able to be individually enabled or disabled via the standard SilverStripe
+YML configuration system and are _disabled_ by default. To enable them:
+
+    AdvancedAssetsFilesSiteConfig:
+      component_security_enabled: true
+      component_embargoexpiry_enabled: true
 
 ## Installation
 

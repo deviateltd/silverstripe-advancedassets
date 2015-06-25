@@ -4,7 +4,7 @@
         <rewrite>
             <rules>
                 <clear/>
-                <rule name="Secured Files Clean URL" stopProcessing="true">
+                <rule name="Advanced Assets Clean URL" stopProcessing="true">
                     <match url="^(.*)$" />
                     <conditions>
                         <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="false" />
