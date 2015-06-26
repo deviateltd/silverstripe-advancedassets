@@ -57,3 +57,8 @@ Add a new block under the "repositories" block:
       }
 
 Now run `dev/build` via the browser or command line - and don't forget to flush.
+
+## Iconography
+
+Component icons courtesy [thenounproject.com](http://www.thenounproject.com) licensed
+under the [Creative Commons 3.0](https://creativecommons.org/licenses/by/3.0/us/).

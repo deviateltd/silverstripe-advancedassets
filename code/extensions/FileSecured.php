@@ -125,24 +125,17 @@ class FileSecured extends DataExtension implements PermissionProvider {
                 $isFile = false;
             }
 
-            // Only show this block if at one of the three components is enabled
-            $showAdvFields = (
-                    AdvancedAssetsFilesSiteConfig::is_security_enabled() ||
-                    AdvancedAssetsFilesSiteConfig::is_embargoexpiry_enabled()
+            $fields->insertAfter(LiteralField::create(
+                    'BottomTaskSelection', 
+                    $this->owner->renderWith('componentField', ArrayData::create(array(
+                        'ComponentSecurity' => AdvancedAssetsFilesSiteConfig::component_cms_icon('security'),
+                        'ComponentEmbargoExpiry' => AdvancedAssetsFilesSiteConfig::component_cms_icon('embargoexpiry'),
+                        'ButtonsSecurity' => $buttonsSecurity,
+                        'ButtonsEmbargoExpiry' => $buttonsEmbargoExpiry
+                    )))
+                ),
+                "ParentID"
             );
-            if($showAdvFields) {
-                $fields->insertAfter(new LiteralField('BottomTaskSelection',
-                    '<div id="Actions" class="field actions">'
-                        . '<label class="left">Advanced settings</label>'
-                        . '<ul>'
-                        . $buttonsEmbargoExpiry
-                        . $buttonsSecurity
-                        . '</ul>'
-                    . '</div>'
-                    ),
-                    "ParentID"
-                );
-            }
 
             if($isFile) {
                 $securitySettingsGroup = FieldGroup::create(
@@ -216,7 +209,13 @@ class FileSecured extends DataExtension implements PermissionProvider {
 
             $securitySettingsGroup->setName("SecuritySettingsGroupField")->addExtraClass('security-settings');;
 
-            $fields->insertAfter($securitySettingsGroup, "BottomTaskSelection");
+            $showAdvanced = (
+                AdvancedAssetsFilesSiteConfig::is_security_enabled() ||
+                AdvancedAssetsFilesSiteConfig::is_embargoexpiry_enabled()
+            );
+            if($showAdvanced) {
+                $fields->insertAfter($securitySettingsGroup, "BottomTaskSelection");
+            }
         }
 
         if(!is_a($this->owner,"Folder") && is_a($this->owner, "File")) {

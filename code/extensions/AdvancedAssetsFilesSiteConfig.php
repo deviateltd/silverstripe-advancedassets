@@ -91,6 +91,23 @@ class AdvancedAssetsFilesSiteConfig extends DataExtension {
     public static function is_embargoexpiry_enabled() {
         return self::is_component_enabled('embargoexpiry');
     }
+    
+    /**
+     * 
+     * Generate an icon with appropriate CSS styling for the CMS for the given 
+     * component.
+     * 
+     * @param string $component
+     * @return string
+     */
+    public static function component_cms_icon($component) {
+        $enabled = (self::is_component_enabled($component) ? 'en' : 'dis') . 'abled';
+        $title = ucfirst($component) . ' component ' . $enabled . '.';
+        return '<span class="component-icon ' 
+            . $component . ' ' 
+            . $enabled . '" title="' . $title 
+            . '">&nbsp;</span>';
+    }
 
     /**
      * 
