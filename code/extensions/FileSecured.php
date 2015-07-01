@@ -517,7 +517,7 @@ class FileSecured extends DataExtension implements PermissionProvider {
                 if($parent && $parent->exists()) {
                     $ret = $parent->getWhoCanViewNice();
                 } else {
-                    $ret = "No one";
+                    $ret = _t("FileSecured.Anyone", "Anyone");
                 }
         }
         return $ret;
@@ -570,7 +570,7 @@ class FileSecured extends DataExtension implements PermissionProvider {
                 if($parent && $parent->exists()) {
                     $ret = $parent->getWhoCanEditNice();
                 } else {
-                    $ret = _t("FileSecured.NoOne", "No one");
+                    $ret = _t("FileSecured.Anyone", "Anyone");
                 }
         }
         
