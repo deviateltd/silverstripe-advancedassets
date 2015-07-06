@@ -7,13 +7,31 @@
  */
 class NonSecuredAssetAdmin extends AssetAdmin {
     
+    /**
+     *
+     * @var int
+     */
     private static $menu_priority = 5;
+    
+    /**
+     *
+     * @var string
+     */
+    private static $menu_icon = "silverstripe-advancedassets/images/icons/controller-non-secured-asset-admin-32.png";
 
+    /**
+     *
+     * @var array
+     */
     private static $allowed_actions = array(
         "doSync",
         "addfolder",
     );
 
+    /**
+     * 
+     * @return void
+     */
     public function init(){
         parent::init();
         $this->initValidate();
