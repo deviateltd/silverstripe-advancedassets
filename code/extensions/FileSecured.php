@@ -80,17 +80,16 @@ class FileSecured extends DataExtension implements PermissionProvider {
                         SECURED_FILES_MODULE_DIR . "/javascript/SecuredFilesLeftAndMain.js",
                     )
             );
+            
             Requirements::css(SECURED_FILES_MODULE_DIR . '/thirdparty/javascript/jquery-ui/timepicker/jquery-ui-timepicker-addon.min.css');
-
-            //local customization
             Requirements::css(SECURED_FILES_MODULE_DIR . "/css/SecuredFilesLeftAndMain.css");
             Requirements::javascript(SECURED_FILES_MODULE_DIR . "/javascript/SecuredFilesLeftAndMain.js");
 
-            if(!is_a($this->owner,"Folder") && is_a($this->owner, "File")) {
-                $buttonsEmbargoExpiry = $this->showButtonsSecurity();
-                $buttonsSecurity = $this->showButtonsEmbargoExpiry();
-                $isFile = true;
-
+            if($this->isFile()) {
+                $buttonsSecurity = $this->showButtonsSecurity();
+                $buttonsEmbargoExpiry = $this->showButtonsEmbargoExpiry();
+            
+                // Embargo field
                 $embargoTypeField = new OptionSetField(
                     "EmbargoType", "",
                     array(
@@ -99,13 +98,13 @@ class FileSecured extends DataExtension implements PermissionProvider {
                         "UntilAFixedDate" => _t('AdvancedSecuredFiles.UNTILAFIXEDDATENICE', 'Hide until set date')
                     )
                 );
-
                 $embargoUntilDateField = DatetimeField::create('EmbargoedUntilDate','');
                 $embargoUntilDateField->getDateField()->setConfig('showcalendar', true)
                     ->setConfig('dateformat', 'dd-MM-yyyy')->setConfig('datavalueformat', 'dd-MM-yyyy')
                     ->setAttribute('readonly', true);
                 $embargoUntilDateField->getTimeField()->setAttribute('readonly', true);
-
+                
+                // Expiry field
                 $expireTypeField = new OptionSetField(
                     "ExpiryType", "",
                     array(
@@ -113,31 +112,12 @@ class FileSecured extends DataExtension implements PermissionProvider {
                         "AtAFixedDate" => _t('AdvancedSecuredFiles.ATAFIXEDDATENICE', 'Set file to expire on')
                     )
                 );
-
                 $expiryDatetime = DatetimeField::create('ExpireAtDate','');
                 $expiryDatetime->getDateField()->setConfig('showcalendar', true)
                     ->setConfig('dateformat', 'dd-MM-yyyy')->setConfig('datavalueformat', 'dd-MM-yyyy')
                     ->setAttribute('readonly', true);
                 $expiryDatetime->getTimeField()->setAttribute('readonly', true);
-            } else {
-                $buttonsEmbargoExpiry = '';
-                $buttonsSecurity = '';
-                $isFile = false;
-            }
-
-            $fields->insertAfter(LiteralField::create(
-                    'BottomTaskSelection', 
-                    $this->owner->renderWith('componentField', ArrayData::create(array(
-                        'ComponentSecurity' => AdvancedAssetsFilesSiteConfig::component_cms_icon('security'),
-                        'ComponentEmbargoExpiry' => AdvancedAssetsFilesSiteConfig::component_cms_icon('embargoexpiry'),
-                        'ButtonsSecurity' => $buttonsSecurity,
-                        'ButtonsEmbargoExpiry' => $buttonsEmbargoExpiry
-                    )))
-                ),
-                "ParentID"
-            );
-
-            if($isFile) {
+                
                 $securitySettingsGroup = FieldGroup::create(
                     FieldGroup::create(
                         $embargoTypeField,
@@ -149,6 +129,8 @@ class FileSecured extends DataExtension implements PermissionProvider {
                     )->addExtraClass('expiry option-change-datetime')->setName("ExpiryGroupField")
                 );
             } else {
+                $buttonsSecurity = $this->showButtonsSecurity();
+                $buttonsEmbargoExpiry = '';
                 $securitySettingsGroup = FieldGroup::create();
             }
 
@@ -177,6 +159,7 @@ class FileSecured extends DataExtension implements PermissionProvider {
                 $groupsMap[$group->ID] = $group->getBreadcrumbs(' > ');
             }
             asort($groupsMap);
+            
             $viewerGroupsField = ListboxField::create("ViewerGroups", _t('AdvancedSecuredFiles.VIEWERGROUPS', "Viewer Groups"))
                 ->setMultiple(true)
                 ->setSource($groupsMap)
@@ -207,13 +190,24 @@ class FileSecured extends DataExtension implements PermissionProvider {
                 )->addExtraClass('whocanedit option-change-listbox')->setName("CanEditGroupField")
             );
 
-            $securitySettingsGroup->setName("SecuritySettingsGroupField")->addExtraClass('security-settings');;
+            $securitySettingsGroup->setName("SecuritySettingsGroupField")->addExtraClass('security-settings');
 
             $showAdvanced = (
                 AdvancedAssetsFilesSiteConfig::is_security_enabled() ||
-                AdvancedAssetsFilesSiteConfig::is_embargoexpiry_enabled()
+                ($this->isFile() && AdvancedAssetsFilesSiteConfig::is_embargoexpiry_enabled())
             );
             if($showAdvanced) {
+                $fields->insertAfter(LiteralField::create(
+                        'BottomTaskSelection', 
+                        $this->owner->renderWith('componentField', ArrayData::create(array(
+                            'ComponentSecurity' => AdvancedAssetsFilesSiteConfig::component_cms_icon('security'),
+                            'ComponentEmbargoExpiry' => AdvancedAssetsFilesSiteConfig::component_cms_icon('embargoexpiry'),
+                            'ButtonsSecurity' => $buttonsSecurity,
+                            'ButtonsEmbargoExpiry' => $buttonsEmbargoExpiry
+                        )))
+                    ),
+                    "ParentID"
+                );
                 $fields->insertAfter($securitySettingsGroup, "BottomTaskSelection");
             }
         }
@@ -1050,5 +1044,13 @@ class FileSecured extends DataExtension implements PermissionProvider {
         }
         
         return array();
+    }
+    
+    /**
+     * 
+     * @return boolean
+     */
+    private function isFile() {
+        return !is_a($this->owner,"Folder") && is_a($this->owner, "File");
     }
 }
