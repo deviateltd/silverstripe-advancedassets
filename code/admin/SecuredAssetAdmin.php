@@ -29,7 +29,7 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      *
      * @var string
      */
-    private static $menu_title = 'Advanced Files';
+    private static $menu_title = 'Advanced Assets';
 
     /**
      *
@@ -258,7 +258,7 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
             $i++;
         }
         if(isset($items[0]->Title)) {
-            $items[0]->Title = _t("SECUREDASSETADMIN.SecuriedFiles", "Advanced Assets");
+            $items[0]->Title = _t("SECUREDASSETADMIN.SecuriedFiles", SECURED_FILES_MODULE_NAME);
         }
 
         return $items;

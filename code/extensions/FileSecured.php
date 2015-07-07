@@ -659,15 +659,15 @@ class FileSecured extends DataExtension implements PermissionProvider {
         return array(
             'SECURED_FILES_VIEW_ALL' => array(
                 'name' => _t('SecuredFiles.VIEW_ALL_DESCRIPTION', 'View any secured file'),
-                'category' => _t('Permissions.SECUREDFILES_CATEGORY', 'Advanced assets permissions'),
+                'category' => _t('Permissions.SECUREDFILES_CATEGORY', SECURED_FILES_MODULE_NAME . ' permissions'),
                 'sort' => -100,
-                'help' => _t('SecuredFiles.VIEW_ALL_HELP', 'Ability to view any advanced file, regardless of the settings on the "Who can view" tab. Requires the "Access to \'Advanced Files\' section" permission')
+                'help' => _t('SecuredFiles.VIEW_ALL_HELP', 'Ability to view any advanced file, regardless of the settings on the "Who can view" tab. Requires the "Access to \'' . SECURED_FILES_MODULE_NAME . '\' section" permission')
             ),
             'SECURED_FILES_EDIT_ALL' => array(
                 'name' => _t('SecuredFiles.EDIT_ALL_DESCRIPTION', 'Edit any secured file'),
-                'category' => _t('Permissions.SECUREDFILES_CATEGORY', 'Advanced files permissions'),
+                'category' => _t('Permissions.SECUREDFILES_CATEGORY', SECURED_FILES_MODULE_NAME . ' permissions'),
                 'sort' => -50,
-                'help' => _t('SecuredFiles.EDIT_ALL_HELP', 'Ability to edit any advanced file, regardless of the settings on the "Who can edit" tab.  Requires the "Access to \'Advanced Files\' section" permission')
+                'help' => _t('SecuredFiles.EDIT_ALL_HELP', 'Ability to edit any advanced file, regardless of the settings on the "Who can edit" tab.  Requires the "Access to \'' . SECURED_FILES_MODULE_NAME . '\' section" permission')
             ),
         );
     }
