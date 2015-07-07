@@ -17,7 +17,7 @@ class NonSecuredAssetAdmin extends AssetAdmin {
      *
      * @var string
      */
-    private static $menu_icon = "silverstripe-advancedassets/images/icons/controller-non-secured-asset-admin-32.png";
+    private static $menu_icon = "silverstripe-advancedassets/images/icons/controller-non-secured-asset-admin-16.png";
 
     /**
      *
