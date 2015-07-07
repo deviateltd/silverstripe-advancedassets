@@ -35,7 +35,7 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      *
      * @var string
      */
-    private static $menu_icon = "silverstripe-advancedassets/resource/images/padlock-gray-16x16.png";
+    private static $menu_icon = "silverstripe-advancedassets/images/icons/controller-secured-asset-admin-16.png";
 
     /**
      *
