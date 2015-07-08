@@ -128,7 +128,7 @@ class FolderSecured extends DataExtension {
                 if($child && is_dir($baseDir . $actualChild)) {
                     //customised
                     //when we synch on assets root
-                    //we don't want to sync the secured root folder _securedfiles
+                    //we don't want to sync the secured root folder SECURED_FILES_ASSET_SUBDIR
                     //This is only the case where both secured child folder and non-secured child folder exist
                     if($parentID === 0 && $child->ID === FileSecured::getSecuredRoot()->ID) {
                         $skipped ++;
