@@ -106,37 +106,38 @@ class SecuredFileController extends Controller {
     public function notAccessible() {
         $config = SiteConfig::current_site_config();
         if(!$content = $config->SecuredFileDefaultContent) {
-            $content = "<p>"._t('SecuredFileController.SecuredFileDefaultContent', "The document is not accessible")."</p>";
+            $content = "<p>" . _t('SecuredFileController.SecuredFileDefaultContent', "The document is not accessible") . "</p>";
         }
         if(!$title = $config->SecuredFileDefaultTitle) {
-            $title = _t('SecuredFileController.SecuredFileDefaultTitle', "The document is not accessible");;
+            $title = _t('SecuredFileController.SecuredFileDefaultTitle', "The document is not accessible");
         }
 
         if(isset($_GET['ContainerURL']) && $_GET['ContainerURL']) {
-            $backLink = '<p><a href="'.$_GET['ContainerURL'].'">Go back</a></p>';
-            $content = $backLink.$content.$backLink;
+            $containerUrl = DBField::create_field('Varchar', $_GET['ContainerURL']);
+            $backLink = '<p><a href="' . $containerUrl . '">Go back</a></p>';
+            $content = $backLink . $content . $backLink;
         }
         if(class_exists('SiteTree')) {
             $tmpPage = new Page();
             $tmpPage->Title = $title;
             $tmpPage->Content = $content;
             // Disable ID-based caching  of the log-in page by making it a random number
-            $tmpPage->ID = -1 * rand(1,10000000);
+            $tmpPage->ID = -1 * rand(1, 10000000);
 
             $controller = Page_Controller::create($tmpPage);
             $controller->setDataModel($this->model);
             $controller->init();
         } else {
             $controller = $this->customise(array(
-                "Content"   => $content,
-                "Title"     => $title,
+                "Content" => $content,
+                "Title" => $title,
             ));
         }
 
         echo $controller->renderWith(
             array('Page')
         )->Value;
-        
+
         exit(0);
     }
 
