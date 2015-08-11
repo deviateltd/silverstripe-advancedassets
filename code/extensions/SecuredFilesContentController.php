@@ -7,6 +7,7 @@
 class SecuredFilesContentController extends Extension {
     
     public function onAfterInit() {
+        Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
         Requirements::javascript(SECURED_FILES_MODULE_DIR . "/javascript/ContentControllerContainingSecuredFiles.js");
     }
 }
