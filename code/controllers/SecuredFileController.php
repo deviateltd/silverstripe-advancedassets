@@ -46,9 +46,13 @@ class SecuredFileController extends Controller {
         }
 
         $this->extend('onAfterInit');
-        $url = array_key_exists('url', $_GET) ? $_GET['url'] : $_SERVER['REQUEST_URI'];
+        $address = $this->getRequest()->getVars();
+        if(empty($address['url'])) {
+            return;
+        }
+		
         // make the $url normalised as "assets/somefolder/somefile.ext, so we could find the file record if it has.
-        $url = Director::makeRelative(ltrim(str_replace(BASE_URL, '', $url), '/'));
+        $url = Director::makeRelative(ltrim(str_replace(BASE_URL, '', $address['url']), '/'));
         $file = File::find($url);
         if($file) {
             if($this->canSendToBrowser($file)) {
@@ -273,7 +277,7 @@ class SecuredFileController extends Controller {
          * issue fixes for IE6,7,8  when downloading a file over HTTPS (http://support.microsoft.com/kb/812935)
          * http://www.dotvoid.com/2009/10/problem-with-downloading-files-with-internet-explorer-over-https/
          */
-        if(isset($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"] == "on")) {
+        if(Director::is_https()) {
             header('Pragma: ');
         }
 
@@ -348,7 +352,7 @@ class SecuredFileController extends Controller {
          * issue fixes for IE6,7,8  when downloading a file over HTTPS (http://support.microsoft.com/kb/812935)
          * http://www.dotvoid.com/2009/10/problem-with-downloading-files-with-internet-explorer-over-https/
          */
-        if(isset($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"] == "on")) {
+        if(Director::is_https()) {
             header('Pragma: ');
         }
 
