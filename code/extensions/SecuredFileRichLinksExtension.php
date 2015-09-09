@@ -1,9 +1,28 @@
 <?php
 /**
- * 
+ *
+ * Prevents a zillion requests for an image and the consequent PHP engine's overhead when for example a page containing
+ * xx images inserted thru CMS WYSIWTG is requested.
+ *
+ * If all these images are "secured", this would mean loading these images via the {@link SecuredFileController}.
+ * Once the page loaded, te browser will send 100a zillion0 requests to the server,
+ *
+ * For argument's sake, of the zillion, let's say 10 are actually viewable by the current user at the current time,
+ * the remainder either require the user to be logged-in, or ar eonly for access by some specific group, or expired,
+ * or embargoed.
+ *
+ * Without being able to change the original image's src, all zillion requests to {@link SecuredFileController} result
+ * in the same zillion browser/screen paint operations even for those images that fall in same 'category',
+ * e.g. 'viewable logged-in only user', the controller will paint the same logged-in-only lockpad image many many
+ * times to the page.
+ *
+ * With this extension, the remaining image src's are replaced with several different LockPad images first, and these
+ * images are directly loaded into the browser without even touching PHP.
+ *
+ * Summary: Avoids zillions of browser/screen paints and unnecessary controller traffic,
+ *
  * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
  * @package silverstripe-advancedassets
- * @see {@link RichLinksExtension}
  */
 class SecuredFileRichLinksExtension extends Extension {
 

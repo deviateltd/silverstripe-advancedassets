@@ -1,6 +1,9 @@
 <?php
 /**
- * 
+ *
+ * Allows CMS authors to customise the icons that are shown to frontend users when attempting to access secured assets
+ * that for one reason or another are unavailable to them at that time.
+ *
  * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
  * @package silverstripe-advancedassets
  */
@@ -115,7 +118,7 @@ class AdvancedAssetsFilesSiteConfig extends DataExtension {
      * @return void
      */
     public function updateCMSFields(FieldList $fields){
-        $fields->addFieldsToTab("Root.SecuredFiles", array(
+        $fields->addFieldsToTab("Root.AdvancedAssets", array(
             UploadField::create('LockpadImageNeedLogIn', 'Lockpad image that shows "need to login"')
                 ->setDescription("Image that shows as default when a image is required to login to view")
                 ->setAllowedMaxFileNumber(1)

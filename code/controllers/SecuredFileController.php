@@ -1,6 +1,9 @@
 <?php
 /**
- * 
+ *
+ * Frontend controller for secured files. Controls aspects of canView() based on file & folder-specific permissions set
+ * via the CMS.
+ *
  * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
  * @package silverstripe-advancedassets
  * {@link SecuredFileController::handleRequest()} handles requested file, based on accessibility

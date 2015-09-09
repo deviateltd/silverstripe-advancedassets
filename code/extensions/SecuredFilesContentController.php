@@ -1,6 +1,8 @@
 <?php
 /**
- * 
+ *
+ * Extends standard {@link Controller} to ensure correct / required JS is used.
+ *
  * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
  * @package silverstripe-advancedassets
  */
