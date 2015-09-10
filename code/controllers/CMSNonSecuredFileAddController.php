@@ -1,6 +1,8 @@
 <?php
 /**
- * 
+ *
+ * Specific controller used to add files to the advanced-assets CMS UI, but that aren't (yet) secured.
+ *
  * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
  * @package silverstripe-advancedassets
  * @todo Modify addFolder() and initValidate() to show messages within the CMS.

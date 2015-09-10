@@ -1,6 +1,8 @@
 <?php
 /**
- * 
+ *
+ * Extends the "Media" popup for controlling CMS access to images and files from via the WYSIWYG editor.
+ *
  * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
  * @package silverstripe-advancedassets
  */

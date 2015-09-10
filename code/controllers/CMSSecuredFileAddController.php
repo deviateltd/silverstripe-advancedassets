@@ -1,5 +1,7 @@
 <?php
 /**
+ *
+ * Specific controller used to add files to the advanced-assets CMS UI, that are secured.
  * 
  * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
  * @package silverstripe-advancedassets

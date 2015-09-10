@@ -1,6 +1,8 @@
 <?php
 /**
- * 
+ *
+ * Creates a new folder on the F/S for uploading assets to, but not in a secure manner. See {@Link SecuredAssetAdmin}.
+ *
  * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
  * @package silverstripe-advancedassets
  * @todo Modify addFolder() and initValidate() to show messages within the CMS.
