@@ -54,8 +54,7 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      * @var array
      */
     private static $allowed_actions = array(
-        "doSync",
-        "addfolder",
+        "addfolder"
     );
 
     /**
@@ -276,20 +275,6 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
                 'category' => _t('Permission.CMS_ACCESS_CATEGORY', 'CMS Access')
             )
         );
-    }
-
-    /**
-     * 
-     * Can be queried with an ajax request to trigger the filesystem sync. It returns a FormResponse status message
-     * to display in the CMS
-     * 
-     * @return null
-     */
-    public function doSync() {
-        $securedRoot = FileSecured::getSecuredRoot();
-        $message = SecuredFilesystem::sync_secured($securedRoot->ID);
-        $this->response->addHeader('X-Status', rawurlencode($message));
-        return;
     }
 
     /**

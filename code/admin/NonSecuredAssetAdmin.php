@@ -26,8 +26,7 @@ class NonSecuredAssetAdmin extends AssetAdmin {
      * @var array
      */
     private static $allowed_actions = array(
-        "doSync",
-        "addfolder",
+        "addfolder"
     );
 
     /**
@@ -90,19 +89,6 @@ class NonSecuredAssetAdmin extends AssetAdmin {
             $items[0]->Link = Controller::join_links(singleton('NonSecuredAssetAdmin')->Link('show'), 0);
         }
         return $items;
-    }
-    
-    /**
-     * Can be queried with an ajax request to trigger the filesystem sync. It returns a FormResponse status message
-     * to display in the CMS
-     * 
-     * @return null
-     */
-    public function doSync() {
-        $message = SecuredFilesystem::sync_secured();
-        $this->response->addHeader('X-Status', rawurlencode($message));
-
-        return;
     }
 
     /**

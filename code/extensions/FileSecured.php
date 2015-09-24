@@ -393,11 +393,13 @@ class FileSecured extends DataExtension implements PermissionProvider {
     }
 
     /**
-     * 
+     * Gets us the module's root directory. Because this is created on-the-fly, then we can never accurately know
+     * its ID.
+     *
      * @return Folder
      */
     public static function getSecuredRoot() {
-        return $securedRoot = Folder::get_one("Folder", "\"ParentID\" = '0' AND \"Secured\" = '1'");
+        return DataObject::get_one("File", "\"ParentID\" = '0' AND \"Secured\" = '1'");
     }
 
     /**
