@@ -36,6 +36,10 @@ class CMSSecuredFileAddController extends CMSFileAddController {
                     $message = _t('SecuredFilesystem.messages.ERROR_ACCESS_ONLY_IN_FILES');
                     return SecuredFilesystem::show_access_message($this, $message);
                 }
+                if(!$folder->canEdit()) {
+                    $message = _t('SecuredFilesystem.messages.ERROR_FOLDER_NO_ACCESS');
+                    return SecuredFilesystem::show_access_message($this, $message);
+                }
             } else {
                 $message = _t('SecuredFilesystem.messages.ERROR_FOLDER_NOT_EXISTS');
                 return SecuredFilesystem::show_access_message($this, $message);
