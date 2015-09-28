@@ -1,0 +1,35 @@
+Folder:
+  is-secured:
+    Secured: 1
+    Name: "My secured folder"
+    ID: 44
+
+Permission:
+  cms-can-view-adv-admin:
+    Code: CMS_ACCESS_SecuredAssetAdmin
+  cms-can-view-std-admin:
+    Code: CMS_ACCESS_AssetAdmin
+  cms-can-view-adv-all:
+    Code: SECURED_FILES_VIEW_ALL
+  cms-can-edit-adv-all:
+    Code: SECURED_FILES_EDIT_ALL
+
+Group:
+  canviewgroup:
+    Title: 'View advanced files only'
+    Permissions: =>Permission.cms-can-view-adv-admin,=>Permission.cms-can-view-std-admin,=>Permission.cms-can-view-adv-all
+  caneditgroup:
+    Title: 'View and Edit advanced files'
+    Permissions: =>Permission.cms-can-view-adv-admin,=>Permission.cms-can-view-std-admin,=>Permission.cms-can-edit-adv-all
+
+Member:
+  can-view-only:
+    FirstName: 'Can'
+    Surname: 'View'
+    Email: 'icanview@test.com'
+    Groups: =>Group.canviewgroup
+  can-add:
+    FirstName: 'Can'
+    Surname: 'Add'
+    Email: 'icanadd@test.com'
+    Groups: =>Group.caneditgroup

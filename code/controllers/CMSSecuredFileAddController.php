@@ -9,7 +9,7 @@
  */
 class CMSSecuredFileAddController extends CMSFileAddController {
     
-    private static $url_segment = 'assets-secured/add';
+    private static $url_segment = 'advanced-assets/add';
     private static $url_priority = 65;
     private static $required_permission_codes = 'CMS_ACCESS_SecuredAssetAdmin';
     private static $menu_title = 'Advanced Assets';
