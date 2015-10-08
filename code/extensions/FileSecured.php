@@ -345,7 +345,9 @@ class FileSecured extends DataExtension implements PermissionProvider {
      */
     public static function find_or_make_secured($folderPath) {
         // Create assets directory, if it is missing
-        if(!file_exists(ASSETS_PATH)) Filesystem::makeFolder(ASSETS_PATH);
+        if(!file_exists(ASSETS_PATH)) {
+            Filesystem::makeFolder(ASSETS_PATH);
+        }
 
         $folderPath = trim(Director::makeRelative($folderPath));
         // replace leading and trailing slashes
@@ -367,8 +369,8 @@ class FileSecured extends DataExtension implements PermissionProvider {
             $item = Folder::get()->filter(array(
                 'ParentID' => $parentID,
                 'Name' => array($partSafe, $part),
-                'CanViewType' => 'Anyone',
-                'CanEditType' => 'LoggedInUsers',
+                'CanViewType' => 'OnlyTheseUsers',
+                'CanEditType' => 'OnlyTheseUsers',
             ))->first();
 
             if(!$item) {
@@ -380,7 +382,7 @@ class FileSecured extends DataExtension implements PermissionProvider {
                 $item->write();
                 // when initial the secured root folder, set its CanViewType to be
                 if(!$parentID) {
-                    $item->CanViewType = "Anyone";
+                    $item->CanViewType = "OnlyTheseUsers";
                 }
             }
             if(!file_exists($item->getFullPath())) {
@@ -397,7 +399,21 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * @return Folder
      */
     public static function getSecuredRoot() {
-        return $securedRoot = Folder::get_one("Folder", "\"ParentID\" = '0' AND \"Secured\" = '1'");
+        return Folder::get_one("Folder", "\"ParentID\" = '0' AND \"Secured\" = '1'");
+    }
+
+    /**
+     * Check if the initial permission settings for the root "secured" (advanced) folder
+     * are those found in the legacy (initial) version of this module.
+     *
+     * @param Folder $rootFolder
+     * @return boolean
+     */
+    public static function root_folder_has_legacy_settings(Folder $rootFolder) {
+        $isEditTypeLegacy = ($rootFolder->CanEditType !== 'OnlyTheseUsers');
+        $isViewTypeLegacy = ($rootFolder->CanViewType !== 'OnlyTheseUsers');
+
+        return $isEditTypeLegacy && $isViewTypeLegacy;
     }
 
     /**
@@ -429,7 +445,7 @@ class FileSecured extends DataExtension implements PermissionProvider {
         if($this->owner->CanViewType != 'OnlyTheseUsers') {
             $viewerGroups = $this->owner->ViewerGroups();
             if($viewerGroups && $viewerGroups->exists()) {
-                    $viewerGroups->removeAll();
+                $viewerGroups->removeAll();
             }
         }
         if($this->owner->CanEditType != 'OnlyTheseUsers') {

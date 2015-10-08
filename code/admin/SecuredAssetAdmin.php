@@ -101,6 +101,18 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
             FileSecured::find_or_make_secured(SECURED_FILES_ASSET_SUBDIR . DIRECTORY_SEPARATOR . "Uploads");
         }
 
+        /*
+         * Check if legacy pre-build settings exist for root folder permissions.
+         * This changed because no-one should be able to access "secured" folders or files without _explicitly_ being
+         * granted such permissions by a CMS admin.
+         */
+        $rootFolder = FileSecured::getSecuredRoot();
+        if(FileSecured::root_folder_has_legacy_settings($rootFolder)) {
+            $rootFolder->CanViewType = 'OnlyTheseUsers';
+            $rootFolder->CanEditType = 'OnlyTheseUsers';
+            $rootFolder->write();
+        }
+
         $resource_folder = BASE_PATH . DIRECTORY_SEPARATOR . SECURED_FILES_MODULE_DIR . DIRECTORY_SEPARATOR . 'resource';
         $default_lock_images_folder = BASE_PATH . DIRECTORY_SEPARATOR . ASSETS_DIR . DIRECTORY_SEPARATOR . '_defaultlockimages';
         if(!is_dir($default_lock_images_folder)) {
@@ -133,6 +145,7 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
     /**
      * 
      * Return fake-ID "root" if no ID is found (needed to upload files into the root-folder)
+     * If no ID is found, it is assumed no secured|advanced assets folder exists, and so it is created.
      * 
      * @return number
      */
