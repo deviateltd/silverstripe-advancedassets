@@ -133,6 +133,7 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
     /**
      * 
      * Return fake-ID "root" if no ID is found (needed to upload files into the root-folder)
+     * If no ID is found, it is assumed no secured|advanced assets folder exists, and so it is created.
      * 
      * @return number
      */
