@@ -7,7 +7,7 @@
  * @package silverstripe-advancedassets
  * @todo Modify addFolder() and initValidate() to show messages within the CMS.
  */
-class NonSecuredAssetAdmin extends AssetAdmin {
+class NonSecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
     
     /**
      *
@@ -22,19 +22,26 @@ class NonSecuredAssetAdmin extends AssetAdmin {
     private static $menu_icon = "silverstripe-advancedassets/images/icons/controller-non-secured-asset-admin-16.png";
 
     /**
+     * This is called "Files" too becuase it overrides the CMS's standard {@link AssetAdmin}.
+     *
+     * @var string
+     */
+    private static $menu_title = "Files (Advanced)";
+
+    /**
      *
      * @var array
      */
     private static $allowed_actions = array(
         "doSync",
-        "addfolder",
+        "addfolder"
     );
 
     /**
      * 
      * @return void
      */
-    public function init(){
+    public function init() {
         parent::init();
         $this->initValidate();
     }
@@ -63,10 +70,23 @@ class NonSecuredAssetAdmin extends AssetAdmin {
     }
 
     /**
+     * @return array
+     */
+    public function providePermissions() {
+        $title = self::$menu_title;
+        return array(
+            "CMS_ACCESS_NonSecuredAssetAdmin" => array(
+                'name' => _t('CMSMain.ACCESS', "Access to '{title}' section", array('title' => $title)),
+                'category' => _t('Permission.CMS_ACCESS_CATEGORY', 'CMS Access')
+            )
+        );
+    }
+
+    /**
      * 
      * @return SS_List
      */
-    public function getList(){
+    public function getList() {
         $list = parent::getList();
         $list = $list->exclude("Secured", "1");
         return $list;
@@ -81,7 +101,7 @@ class NonSecuredAssetAdmin extends AssetAdmin {
     }
 
     /**
-     * 
+     * @param boolean $unlinked
      * @return array
      */
     public function Breadcrumbs($unlinked = false) {
