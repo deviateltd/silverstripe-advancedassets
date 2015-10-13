@@ -20,23 +20,23 @@ class FileSecuredTest extends SapphireTest {
      * 
      */
     public function testCanView() {
-        $member = $this->objFromFixture('Member', 'can-view-secured-files');
+        $member = $this->objFromFixture('Member', 'can-view-secured-asset-admin');
         $file = $this->createSecuredFile('CanViewType', 'LoggedInUsers');
         $this->assertTrue($file->canView($member));
         
-        $member = $this->objFromFixture('Member', 'can-view-unsecured-files-only');
+        $member = $this->objFromFixture('Member', 'can-view-standard-asset-admin-only');
         // For completeness - essentially replicate standard CMS permissions checking
         $file = $this->createUnsecuredFile();
         $this->assertTrue($file->canView($member));
         $file = $this->createSecuredFile('CanViewType', 'LoggedInUsers');
         $this->assertFalse($file->canView($member));
         
-        $member = $this->objFromFixture('Member', 'can-view-secured-files');
+        $member = $this->objFromFixture('Member', 'can-view-secured-asset-admin');
         $file = $this->createUnsecuredFile();
         $this->assertTrue($file->canView($member));
         
         // CMS user, but without any secured-specific permissions
-        $member = $this->objFromFixture('Member', 'can-view-unsecured-files-only');
+        $member = $this->objFromFixture('Member', 'can-view-standard-asset-admin-only');
         $file = $this->createSecuredFile('CanViewType', 'LoggedInUsers');
         $this->assertFalse($file->canView($member));
      
@@ -45,7 +45,7 @@ class FileSecuredTest extends SapphireTest {
         $folder = $this->createSecuredFolder('CanViewType', 'Anyone', array(
             'ParentID' => 1
         ));
-        $member = $this->objFromFixture('Member', 'can-view-unsecured-files-only');
+        $member = $this->objFromFixture('Member', 'can-view-standard-asset-admin-only');
         $file = $this->createSecuredFile('CanViewType', 'Inherit', array(
             'ParentID' => $folder->ID
         ));
@@ -53,7 +53,7 @@ class FileSecuredTest extends SapphireTest {
         $folder = $this->createSecuredFolder('CanViewType', 'LoggedInUsers', array(
             'ParentID' => 1
         ));
-        $member = $this->objFromFixture('Member', 'can-view-secured-files');
+        $member = $this->objFromFixture('Member', 'can-view-secured-asset-admin');
         $file = $this->createSecuredFile('CanViewType', 'Inherit', array(
             'ParentID' => $folder->ID
         ));
@@ -63,7 +63,7 @@ class FileSecuredTest extends SapphireTest {
         $folder = $this->createSecuredFolder('CanViewType', 'LoggedInUsers', array(
             'ParentID' => 1
         ));
-        $member = $this->objFromFixture('Member', 'can-view-unsecured-files-only');
+        $member = $this->objFromFixture('Member', 'can-view-standard-asset-admin-only');
         $file = $this->createSecuredFile('CanViewType', 'Inherit', array(
             'ParentID' => $folder->ID
         ));
@@ -73,40 +73,40 @@ class FileSecuredTest extends SapphireTest {
     /**
      * Users may well be logged into the CMS, but can I see file(s) in the front-end too?
      * (and other stories)
-     * 
+     *
      * See testCanViewFrontByUser() and testCanViewFrontByTime() for more complete tests
      */
     public function testCanViewFront() {
         $member = $this->objFromFixture('Member', 'can-view-secured-files');
         $file = $this->createSecuredFile('CanViewType', 'LoggedInUsers');
         $this->assertTrue($file->canViewFront($member));
-        
+
         $member = $this->objFromFixture('Member', 'can-view-unsecured-files-only');
         // For completeness - essentially replicate standard CMS permissions checking
         $file = $this->createUnsecuredFile();
         $this->assertTrue($file->canViewFront($member));
         $file = $this->createSecuredFile('CanViewType', 'LoggedInUsers');
         $this->assertTrue($file->canViewFront($member));
-        
+
         $member = $this->objFromFixture('Member', 'can-view-secured-files');
         $file = $this->createUnsecuredFile();
         $this->assertTrue($file->canViewFront($member));
-        
+
         // CMS user, but without any secured-specific permissions
         $member = $this->objFromFixture('Member', 'can-view-unsecured-files-only');
         $file = $this->createSecuredFile('CanViewType', 'LoggedInUsers');
         $this->assertTrue($file->canViewFront($member));
-        
+
         $file = $this->createSecuredFile('CanViewType', 'Anyone');
         $this->assertTrue($file->canViewFront());
-        
+
         $member = $this->objFromFixture('Member', 'can-view-secured-files');
         $file = $this->createSecuredFile('CanViewType', 'LoggedInUsers');
         $this->assertTrue($file->canViewFront($member));
     }
-    
+
     /**
-     * 
+     *
      */
     public function testCanViewFrontByTime() {
         $file = $this->createSecuredFile('CanViewType', 'LoggedInUsers', array(
@@ -114,20 +114,20 @@ class FileSecuredTest extends SapphireTest {
             'EmbargoType' => 'None'
         ));
         $this->assertTrue($file->canViewFrontByTime());
-        
+
         $file = $this->createSecuredFile('CanViewType', 'LoggedInUsers', array(
             'ParentID' => 1,
             'EmbargoType' => 'Indefinitely'
         ));
         $this->assertFalse($file->canViewFrontByTime());
-        
+
         $file = $this->createSecuredFile('CanViewType', 'LoggedInUsers', array(
             'ParentID' => 1,
             'EmbargoType' => 'UntilAFixedDate',
             'EmbargoedUntilDate' => '2030-12-01 01:00:00'
         ));
         $this->assertFalse($file->canViewFrontByTime());
-        
+
         $file = $this->createSecuredFile('CanViewType', 'LoggedInUsers', array(
             'ParentID' => 1,
             'EmbargoType' => 'UntilAFixedDate',
@@ -135,26 +135,26 @@ class FileSecuredTest extends SapphireTest {
         ));
         $this->assertTrue($file->canViewFrontByTime());
     }
- 
+
     /**
-     * 
+     *
      */
     public function testCanViewFrontByUser() {
         $file = $this->createSecuredFile('CanViewType', 'Anyone');
         $this->assertTrue($file->canViewFrontByUser());
-        
+
         // For logged-in users only - deny
         // @todo How to prevent unit-test invoking a logged-in user?
 //        $member = $this->objFromFixture('Member', 'can-view-unsecured-files-only');
 //        $file = $this->createSecuredFile('CanViewType', 'LoggedInUsers');
 //        $this->assertFalse($file->canViewFrontByUser($member));
-        
+
         $member = $this->objFromFixture('Member', 'can-view-unsecured-files-only');
         $file = $this->createSecuredFile('CanViewType', 'Inherit', array(
             'ParentID' => 1
         ));
         $this->assertTrue($file->canViewFrontByUser($member));
-        
+
         // Permissions on Parent have not been set, assume all is OK
         $file = $this->createSecuredFile('CanViewType', 'Inherit', array(
             'ParentID' => 0
