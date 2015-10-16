@@ -272,23 +272,30 @@ class FileSecured extends DataExtension implements PermissionProvider {
         if($member && Permission::checkMember($member, array("ADMIN", "SECURED_FILES_VIEW_ALL"))) {
             return true;
         }
-        
+
+        // Check for empty spec and Deny - erring
+        if(!$this->owner->CanViewType) {
+            return false;
+        }
+
         // check different CanViewType accordingly
-        if(!$this->owner->CanViewType || $this->owner->CanViewType == 'Anyone') { // check for empty spec
+        if($this->owner->CanViewType == 'Anyone') {
             return true;
         } else if($this->owner->CanViewType == "LoggedInUsers") {
             return $member && $member->exists();
         } else if($this->owner->CanViewType == "OnlyTheseUsers") {
             return $member && $member->exists() && $member->inGroups($this->owner->ViewerGroups());
         } else if($this->owner->CanViewType == "Inherit") {
-            $folder = Folder::get_by_id("Folder", $this->owner->ParentID);
-            if($folder && $folder->exists()) {
-                return $folder->canViewFrontByUser($member);
-            } else {
-                return true;
+            // Usually only a problem when running tests without explicitly setting a parent
+            if($this->owner->ParentID) {
+                $folder = Folder::get_by_id("Folder", $this->owner->ParentID);
+                if ($folder && $folder->exists()) {
+                    return $folder->canViewFrontByUser($member);
+                }
             }
         }
 
+        // Err on the side of caution - https://en.wiktionary.org/wiki/err#Etymology
         return false;
     }
 
@@ -345,7 +352,9 @@ class FileSecured extends DataExtension implements PermissionProvider {
      */
     public static function find_or_make_secured($folderPath) {
         // Create assets directory, if it is missing
-        if(!file_exists(ASSETS_PATH)) Filesystem::makeFolder(ASSETS_PATH);
+        if(!file_exists(ASSETS_PATH)) {
+            Filesystem::makeFolder(ASSETS_PATH);
+        }
 
         $folderPath = trim(Director::makeRelative($folderPath));
         // replace leading and trailing slashes
@@ -397,7 +406,21 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * @return Folder
      */
     public static function getSecuredRoot() {
-        return $securedRoot = Folder::get_one("Folder", "\"ParentID\" = '0' AND \"Secured\" = '1'");
+        return Folder::get_one("Folder", "\"ParentID\" = '0' AND \"Secured\" = '1'");
+    }
+
+    /**
+     * Check if the initial permission settings for the root "secured" (advanced) folder
+     * are those found in the legacy (initial) version of this module.
+     *
+     * @param Folder $rootFolder
+     * @return boolean
+     */
+    public static function root_folder_has_legacy_settings(Folder $rootFolder) {
+        $isEditTypeLegacy = ($rootFolder->CanEditType !== 'OnlyTheseUsers');
+        $isViewTypeLegacy = ($rootFolder->CanViewType !== 'OnlyTheseUsers');
+
+        return $isEditTypeLegacy && $isViewTypeLegacy;
     }
 
     /**
@@ -429,7 +452,7 @@ class FileSecured extends DataExtension implements PermissionProvider {
         if($this->owner->CanViewType != 'OnlyTheseUsers') {
             $viewerGroups = $this->owner->ViewerGroups();
             if($viewerGroups && $viewerGroups->exists()) {
-                    $viewerGroups->removeAll();
+                $viewerGroups->removeAll();
             }
         }
         if($this->owner->CanEditType != 'OnlyTheseUsers') {
