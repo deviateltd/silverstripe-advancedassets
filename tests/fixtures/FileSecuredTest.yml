@@ -1,34 +1,50 @@
 # Test Members+Groups
+Group:
+  can-view-is-admin:
+    Title: 'We see all'
+  can-view-secured-asset-admin:
+    Title: 'We see some only within the secured asset admin'
+  can-view-secure-assets-in-frontend:
+    Title: 'We see all secured assets in the frontend'
+  can-view-standard-asset-admin-only:
+    Title: 'We see all non-secured assets in the standard asset admin'
+
 Member:
-  can-view-secured-files:
+  can-view-is-admin:
     FirstName: Big
     Surname: 'Bad Wolf'
     Email: big.bad.wolf@munchgranny.nz
     Password: test
-  can-view-unsecured-files-only:
+    Groups: =>Group.can-view-is-admin
+  can-view-secured-asset-admin:
     FirstName: Big
-    Surname: 'Friendly Giant'
-    Email: bfg@largehumanoid.nz
+    Surname: 'Bad Wolf'
+    Email: big.good.wolf@munchgranny.nz
     Password: test
-    
-Group:
-  can-view:
-    Code: can-view
-    Members: =>Member.can-view-secured-files
-  cannot-view:
-    Code: cannot-view
-    Members: =>Member.can-view-unsecured-files-only
+    Groups: =>Group.can-view-secured-asset-admin
+  can-view-standard-asset-admin-only:
+    FirstName: Big
+    Surname: 'Bad Wolf'
+    Email: big.good.bunny@munchgranny.nz
+    Password: test
+    Groups: =>Group.can-view-standard-asset-admin-only
+  can-view-secure-assets-in-frontend:
+    FirstName: Small
+    Surname: 'Sad Wolf'
+    Email: small.sad.wolf@lovesgranny.nz
+    Password: test
+    Groups: =>Group.can-view-secure-assets-in-frontend
     
 Permission:
-  secured-01:
+  can-view-is-admin:
     Code: ADMIN
-    Group: =>Group.can-view
-  secured-02:
+    GroupID: =>Group.can-view-is-admin
+  can-view-secured-asset-admin:
     Code: CMS_ACCESS_SecuredAssetAdmin
-    Group: =>Group.can-view
-  secured-02:
+    GroupID: =>Group.can-view-secured-asset-admin
+  can-view-secure-assets-in-frontend:
     Code: SECURED_FILES_VIEW_ALL
-    Group: =>Group.can-view
-  not-secured-01:
+    GroupID: =>Group.can-view-secure-assets-in-frontend
+  can-view-standard-asset-admin-only:
     Code: CMS_ACCESS_AssetAdmin
-    Group: =>Group.cannot-view
+    GroupID: =>Group.can-view-standard-asset-admin-only

@@ -5,3 +5,6 @@ en:
       ERROR_ACCESS_ONLY_IN_SECURED_FILES: 'This folder is only accessible via the "Advanced Assets" admin.'
       ERROR_FOLDER_NOT_EXISTS: "The selected folder doesn't exist"
       ERROR_FOLDER_NO_ACCESS: "You don't have permission to access the selected folder."
+  NonSecuredAssetAdmin:
+    labels:
+      CMS_PERMISSIONS_LABEL_FILES_ADVANCED: "Files (Advanced)"
