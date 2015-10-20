@@ -192,6 +192,7 @@ class SecuredFileRichLinksExtension extends Extension {
         $content = $this->owner->value;
         $originals = array();
         $replacements = array();
+        $fileStack = array();
 
         // find all image <img> for processing
         preg_match_all('/<img.*class="([^"]*)".*src="([^"]*)".*>/U', $content, $imatches);
@@ -251,7 +252,9 @@ class SecuredFileRichLinksExtension extends Extension {
         // Attach the file type and size to each of the links.
         for($i = 0; $i < count($matches[0]); $i++) {
             $file = DataObject::get_by_id('File', $matches[1][$i]);
-            if($file && $file->exists() && $file->Secured) {
+            $notInStack = !in_array($file->ID, $fileStack);
+            if($file && $file->exists() && $file->Secured && $notInStack) {
+                $fileStack[] = $file->ID;
                 $size = $file->getSize();
                 $ext = strtoupper($file->getExtension());
                 $canViewByTime = $file->canViewFrontByTime();
@@ -274,7 +277,7 @@ class SecuredFileRichLinksExtension extends Extension {
                     $newLink = $matches[0][$i];
                 }
                 
-                $newLink = $newLink."<span class='fileExt'> [$ext, $size]</span>";
+                $newLink .= "<span class='fileExt'> [$ext, $size]</span>";
                 $originals[] = $matches[0][$i];
                 $replacements[] = $newLink;
             }
