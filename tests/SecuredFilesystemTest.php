@@ -25,6 +25,17 @@ class SecuredFilesystemTest extends SapphireTest {
         $result = SecuredFilesystem::get_numeric_identifier($controller, 'ParentID');
         $this->assertInternalType('integer', $result);
         $this->assertEquals(40, $result);
+
+        //
+        $controller = $this->getTestController(array('ParentID' => '40 '), 'POST');
+        $result = SecuredFilesystem::get_numeric_identifier($controller, 'ParentID');
+        $this->assertInternalType('integer', $result);
+        $this->assertEquals(40, $result);
+
+        $controller = $this->getTestController(array('ParentID' => '40 '), 'GET');
+        $result = SecuredFilesystem::get_numeric_identifier($controller, 'ParentID');
+        $this->assertInternalType('integer', $result);
+        $this->assertEquals(40, $result);
         
         $controller = $this->getTestController(array('DUMMY' => 40), 'GET');
         $result = SecuredFilesystem::get_numeric_identifier($controller, 'ID');
@@ -40,7 +51,7 @@ class SecuredFilesystemTest extends SapphireTest {
      */
     private function getTestController($vars, $method) {
         $controller = Controller::create();
-        if($method === 'post') {
+        if($method == 'POST') {
             $getVars = array();
             $postVars = $vars;
         } else {

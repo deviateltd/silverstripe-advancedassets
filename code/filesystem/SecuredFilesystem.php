@@ -70,7 +70,8 @@ class SecuredFilesystem extends Filesystem {
      * @retun number
      */
     public static function get_numeric_identifier(Controller $controller, $identifier = 'ID') {
-        $params = $controller->getRequest()->getVars();
+        // Deal-to all types of incoming data
+        $params = $controller->getRequest()->requestVars();
         $useId = function() use($controller, $params, $identifier) {
             if(!isset($params[$identifier])) {
                 if(!isset($controller->urlParams[$identifier])) {
@@ -80,8 +81,9 @@ class SecuredFilesystem extends Filesystem {
             }
             return $params[$identifier];
         };
-        
-        $id = $useId();
-        return (int) !empty($id) && is_numeric($id) ? $id : 0;
+
+        // We may have a padded string e.g. "1217 ". Without first truncating, we'd return 0 and pass tests...
+        $id = (int) trim($useId());
+        return !empty($id) && is_numeric($id) ? $id : 0;
     }
 }
