@@ -71,19 +71,30 @@ class SecuredFilesystem extends Filesystem {
      */
     public static function get_numeric_identifier(Controller $controller, $identifier = 'ID') {
         // Deal-to all types of incoming data
-        $params = $controller->getRequest()->requestVars();
-        $useId = function() use($controller, $params, $identifier) {
-            if(!isset($params[$identifier])) {
-                if(!isset($controller->urlParams[$identifier])) {
-                    return 0;
+        if(!$controller->hasMethod('currentPageID')) {
+            return 0;
+        }
+
+        // Use native SS logic to deal with an identifier of 'ID'
+        if($identifier == 'ID') {
+            $useId = $controller->currentPageID();
+        // Otherwise it's custom
+        } else {
+            $params = $controller->getRequest()->requestVars();
+            $idFromFunc = function() use($controller, $params, $identifier) {
+                if(!isset($params[$identifier])) {
+                    if(!isset($controller->urlParams[$identifier])) {
+                        return 0;
+                    }
+                    return $controller->urlParams[$identifier];
                 }
-                return $controller->urlParams[$identifier];
-            }
-            return $params[$identifier];
-        };
+                return $params[$identifier];
+            };
+            $useId = $idFromFunc();
+        }
 
         // We may have a padded string e.g. "1217 ". Without first truncating, we'd return 0 and pass tests...
-        $id = (int) trim($useId());
+        $id = (int) trim($useId);
         return !empty($id) && is_numeric($id) ? $id : 0;
     }
 }
