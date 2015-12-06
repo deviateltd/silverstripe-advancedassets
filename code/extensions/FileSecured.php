@@ -306,15 +306,16 @@ class FileSecured extends DataExtension implements PermissionProvider {
      */
     public function isEmbargoed() {
         $embargoUntilFixedDate = $this->owner->EmbargoType == 'UntilAFixedDate';
-        $embargo = (
-            !empty($this->owner->EmbargoedUntilDate) && 
-            SS_Datetime::now()->Value < $this->owner->EmbargoedUntilDate
+        $embargoDate = $this->owner->EmbargoedUntilDate;
+        $doEmbargo = (
+            !empty($embargoDate) &&
+            (strtotime(SS_Datetime::now()->Value) < strtotime($embargoDate))
         );
         
         if($this->owner->EmbargoType == 'Indefinitely') {
             return true;
         }
-        if($embargoUntilFixedDate && $embargo) {
+        if($embargoUntilFixedDate && $doEmbargo) {
             return true;
         }
         
@@ -328,12 +329,13 @@ class FileSecured extends DataExtension implements PermissionProvider {
      */
     public function isExpired() {
         $expireAtFixedDate = $this->owner->ExpiryType == 'AtAFixedDate';
-        $expiredDate = (
-            !empty($this->owner->ExpireAtDate) && 
-            SS_Datetime::now()->Value >= $this->owner->ExpireAtDate
+        $expiredDate = $this->owner->ExpireAtDate;
+        $doExpired = (
+            !empty($expiredDate) &&
+            (strtotime(SS_Datetime::now()->Value) >= strtotime($expiredDate))
         );
         
-        if($expireAtFixedDate && $expiredDate) {
+        if($expireAtFixedDate && $doExpired) {
             return true;
         }
         return false;
