@@ -9,7 +9,8 @@
  * @todo How many of the "cloned" methods/props from {@link File} are actually needed?
  * @todo Refactor canXX() methods to use bitwise logic to make checks far less fallible
  */
-class FileSecured extends DataExtension implements PermissionProvider {
+class FileSecured extends DataExtension implements PermissionProvider
+{
     
     private static $db = array(
         "Secured" => "Boolean",
@@ -40,8 +41,9 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * 
      * @return string
      */
-    private function showButtonsSecurity() {
-        $buttons = 
+    private function showButtonsSecurity()
+    {
+        $buttons =
             '<li class="ss-ui-button" data-panel="whocanview">Who Can View</li>' .
             '<li class="ss-ui-button" data-panel="whocanedit">Who Can Edit</li>';
 
@@ -54,7 +56,8 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * 
      * @return string
      */
-    private function showButtonsEmbargoexpiry() {
+    private function showButtonsEmbargoexpiry()
+    {
         $buttons =
             '<li class="ss-ui-button" data-panel="embargo">Embargo</li>' .
             '<li class="ss-ui-button" data-panel="expiry">Expiry</li>';
@@ -69,9 +72,10 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * @param FieldList $fields
      * @return void
      */
-    public function updateCMSFields(FieldList $fields) {
+    public function updateCMSFields(FieldList $fields)
+    {
         $controller = Controller::curr();
-        if($controller instanceof SecuredAssetAdmin || $controller instanceof CMSSecuredFileAddController) {
+        if ($controller instanceof SecuredAssetAdmin || $controller instanceof CMSSecuredFileAddController) {
             Requirements::combine_files(
                 'securedassetsadmincmsfields.js',
                     array(
@@ -85,7 +89,7 @@ class FileSecured extends DataExtension implements PermissionProvider {
             Requirements::css(SECURED_FILES_MODULE_DIR . "/css/SecuredFilesLeftAndMain.css");
             Requirements::javascript(SECURED_FILES_MODULE_DIR . "/javascript/SecuredFilesLeftAndMain.js");
 
-            if($this->isFile()) {
+            if ($this->isFile()) {
                 $buttonsSecurity = $this->showButtonsSecurity();
                 $buttonsEmbargoExpiry = $this->showButtonsEmbargoExpiry();
             
@@ -98,7 +102,7 @@ class FileSecured extends DataExtension implements PermissionProvider {
                         "UntilAFixedDate" => _t('AdvancedSecuredFiles.UNTILAFIXEDDATENICE', 'Hide until set date')
                     )
                 );
-                $embargoUntilDateField = DatetimeField::create('EmbargoedUntilDate','');
+                $embargoUntilDateField = DatetimeField::create('EmbargoedUntilDate', '');
                 $embargoUntilDateField->getDateField()->setConfig('showcalendar', true)
                     ->setConfig('dateformat', 'dd-MM-yyyy')->setConfig('datavalueformat', 'dd-MM-yyyy')
                     ->setAttribute('readonly', true);
@@ -112,7 +116,7 @@ class FileSecured extends DataExtension implements PermissionProvider {
                         "AtAFixedDate" => _t('AdvancedSecuredFiles.ATAFIXEDDATENICE', 'Set file to expire on')
                     )
                 );
-                $expiryDatetime = DatetimeField::create('ExpireAtDate','');
+                $expiryDatetime = DatetimeField::create('ExpireAtDate', '');
                 $expiryDatetime->getDateField()->setConfig('showcalendar', true)
                     ->setConfig('dateformat', 'dd-MM-yyyy')->setConfig('datavalueformat', 'dd-MM-yyyy')
                     ->setAttribute('readonly', true);
@@ -135,7 +139,7 @@ class FileSecured extends DataExtension implements PermissionProvider {
             }
 
             $canViewTypeField = new OptionSetField(
-                "CanViewType","",
+                "CanViewType", "",
                 array(
                     "Inherit"=>_t('AdvancedSecuredFiles.INHERIT', "Inherit from parent folder"),
                     "Anyone"=> _t('SiteTree.ACCESSANYONE', 'Anyone'),
@@ -154,7 +158,7 @@ class FileSecured extends DataExtension implements PermissionProvider {
             );
 
             $groupsMap = array();
-            foreach(Group::get() as $group) {
+            foreach (Group::get() as $group) {
                 // Listboxfield values are escaped, use ASCII char instead of &raquo;
                 $groupsMap[$group->ID] = $group->getBreadcrumbs(' > ');
             }
@@ -196,9 +200,9 @@ class FileSecured extends DataExtension implements PermissionProvider {
                 AdvancedAssetsFilesSiteConfig::is_security_enabled() ||
                 ($this->isFile() && AdvancedAssetsFilesSiteConfig::is_embargoexpiry_enabled())
             );
-            if($showAdvanced) {
+            if ($showAdvanced) {
                 $fields->insertAfter(LiteralField::create(
-                        'BottomTaskSelection', 
+                        'BottomTaskSelection',
                         $this->owner->renderWith('componentField', ArrayData::create(array(
                             'ComponentSecurity' => AdvancedAssetsFilesSiteConfig::component_cms_icon('security'),
                             'ComponentEmbargoExpiry' => AdvancedAssetsFilesSiteConfig::component_cms_icon('embargoexpiry'),
@@ -212,9 +216,9 @@ class FileSecured extends DataExtension implements PermissionProvider {
             }
         }
 
-        if(!is_a($this->owner,"Folder") && is_a($this->owner, "File")) {
+        if (!is_a($this->owner, "Folder") && is_a($this->owner, "File")) {
             $parentIDField = $fields->dataFieldByName("ParentID");
-            if($controller instanceof SecuredAssetAdmin) {
+            if ($controller instanceof SecuredAssetAdmin) {
                 $securedRoot = FileSecured::getSecuredRoot();
                 $parentIDField-> setTreeBaseID($securedRoot->ID);
                 $parentIDField->setFilterFunction(create_function('$node', "return \$node->Secured == 1;"));
@@ -234,11 +238,12 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * @param Member $member
      * @return boolean
      */
-    public function canViewFront($member = null) {
-        if(!$this->canViewFrontByTime()) {
+    public function canViewFront($member = null)
+    {
+        if (!$this->canViewFrontByTime()) {
             return false;
         }
-        if(!$this->canViewFrontByUser($member)) {
+        if (!$this->canViewFrontByUser($member)) {
             return false;
         }
         
@@ -253,7 +258,8 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * 
      * @return boolean True or False depending on whether this document is embargoed
      */
-    public function canViewFrontByTime() {
+    public function canViewFrontByTime()
+    {
         $canViewFrontByTime = !$this->isEmbargoed() && !$this->isExpired();
         return $canViewFrontByTime;
     }
@@ -263,31 +269,32 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * @param Member $member
      * @return boolean
      */
-    public function canViewFrontByUser($member = null) {
+    public function canViewFrontByUser($member = null)
+    {
         //If admin, bypass anyway
-        if(!$member || !(is_a($member, 'Member')) || is_numeric($member)) {
+        if (!$member || !(is_a($member, 'Member')) || is_numeric($member)) {
             $member = Member::currentUser();
         }
         
-        if($member && Permission::checkMember($member, array("ADMIN", "SECURED_FILES_VIEW_ALL"))) {
+        if ($member && Permission::checkMember($member, array("ADMIN", "SECURED_FILES_VIEW_ALL"))) {
             return true;
         }
 
         // Check for empty spec and Deny - erring
-        if(!$this->owner->CanViewType) {
+        if (!$this->owner->CanViewType) {
             return false;
         }
 
         // check different CanViewType accordingly
-        if($this->owner->CanViewType == 'Anyone') {
+        if ($this->owner->CanViewType == 'Anyone') {
             return true;
-        } else if($this->owner->CanViewType == "LoggedInUsers") {
+        } elseif ($this->owner->CanViewType == "LoggedInUsers") {
             return $member && $member->exists();
-        } else if($this->owner->CanViewType == "OnlyTheseUsers") {
+        } elseif ($this->owner->CanViewType == "OnlyTheseUsers") {
             return $member && $member->exists() && $member->inGroups($this->owner->ViewerGroups());
-        } else if($this->owner->CanViewType == "Inherit") {
+        } elseif ($this->owner->CanViewType == "Inherit") {
             // Usually only a problem when running tests without explicitly setting a parent
-            if($this->owner->ParentID) {
+            if ($this->owner->ParentID) {
                 $folder = Folder::get_by_id("Folder", $this->owner->ParentID);
                 if ($folder && $folder->exists()) {
                     return $folder->canViewFrontByUser($member);
@@ -304,7 +311,8 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * 
      * @return boolean
      */
-    public function isEmbargoed() {
+    public function isEmbargoed()
+    {
         $embargoUntilFixedDate = $this->owner->EmbargoType == 'UntilAFixedDate';
         $embargoDate = $this->owner->EmbargoedUntilDate;
         $doEmbargo = (
@@ -312,10 +320,10 @@ class FileSecured extends DataExtension implements PermissionProvider {
             (strtotime(SS_Datetime::now()->Value) < strtotime($embargoDate))
         );
         
-        if($this->owner->EmbargoType == 'Indefinitely') {
+        if ($this->owner->EmbargoType == 'Indefinitely') {
             return true;
         }
-        if($embargoUntilFixedDate && $doEmbargo) {
+        if ($embargoUntilFixedDate && $doEmbargo) {
             return true;
         }
         
@@ -327,7 +335,8 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * 
      * @return boolean
      */
-    public function isExpired() {
+    public function isExpired()
+    {
         $expireAtFixedDate = $this->owner->ExpiryType == 'AtAFixedDate';
         $expiredDate = $this->owner->ExpireAtDate;
         $doExpired = (
@@ -335,7 +344,7 @@ class FileSecured extends DataExtension implements PermissionProvider {
             (strtotime(SS_Datetime::now()->Value) >= strtotime($expiredDate))
         );
         
-        if($expireAtFixedDate && $doExpired) {
+        if ($expireAtFixedDate && $doExpired) {
             return true;
         }
         return false;
@@ -352,22 +361,23 @@ class FileSecured extends DataExtension implements PermissionProvider {
      *                              to the "assets/" directory.
      * @return Folder | null
      */
-    public static function find_or_make_secured($folderPath) {
+    public static function find_or_make_secured($folderPath)
+    {
         // Create assets directory, if it is missing
-        if(!file_exists(ASSETS_PATH)) {
+        if (!file_exists(ASSETS_PATH)) {
             Filesystem::makeFolder(ASSETS_PATH);
         }
 
         $folderPath = trim(Director::makeRelative($folderPath));
         // replace leading and trailing slashes
         $folderPath = preg_replace('/^\/?(.*)\/?$/', '$1', $folderPath);
-        $parts = explode("/",$folderPath);
+        $parts = explode("/", $folderPath);
 
         $parentID = 0;
         $item = null;
         $filter = FileNameFilter::create();
-        foreach($parts as $part) {
-            if(!$part) {
+        foreach ($parts as $part) {
+            if (!$part) {
                 continue; // happens for paths with a trailing slash
             }
 
@@ -382,7 +392,7 @@ class FileSecured extends DataExtension implements PermissionProvider {
                 'CanEditType' => 'LoggedInUsers',
             ))->first();
 
-            if(!$item) {
+            if (!$item) {
                 $item = new Folder();
                 $item->ParentID = $parentID;
                 $item->Name = $partSafe;
@@ -390,12 +400,12 @@ class FileSecured extends DataExtension implements PermissionProvider {
                 $item->Secured = true;
                 $item->write();
                 // when initial the secured root folder, set its CanViewType to be
-                if(!$parentID) {
+                if (!$parentID) {
                     $item->CanViewType = 'Anyone';
                     $item->CanEditType = 'LoggedInUsers';
                 }
             }
-            if(!file_exists($item->getFullPath())) {
+            if (!file_exists($item->getFullPath())) {
                 Filesystem::makeFolder($item->getFullPath());
             }
             $parentID = $item->ID;
@@ -408,7 +418,8 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * 
      * @return Folder
      */
-    public static function getSecuredRoot() {
+    public static function getSecuredRoot()
+    {
         return Folder::get_one("Folder", "\"ParentID\" = '0' AND \"Secured\" = '1'");
     }
 
@@ -416,19 +427,20 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * 
      * @return void
      */
-    public function onBeforeWrite() {
-        if($this->owner->ParentID) {
+    public function onBeforeWrite()
+    {
+        if ($this->owner->ParentID) {
             $folder = DataObject::get_by_id("Folder", $this->owner->ParentID);
-            if($folder && $folder->exists() && $folder->Secured) {
+            if ($folder && $folder->exists() && $folder->Secured) {
                 $this->owner->Secured = true;
             }
         }
         
-        if($this->owner->EmbargoType != 'UntilAFixedDate') {
+        if ($this->owner->EmbargoType != 'UntilAFixedDate') {
             $this->owner->EmbargoedUntilDate = null;
         }
 
-        if($this->owner->ExpiryType != 'AtAFixedDate') {
+        if ($this->owner->ExpiryType != 'AtAFixedDate') {
             $this->owner->ExpireAtDate = null;
         }
     }
@@ -437,16 +449,17 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * 
      * @return void
      */
-    public function onAfterWrite() {
-        if($this->owner->CanViewType != 'OnlyTheseUsers') {
+    public function onAfterWrite()
+    {
+        if ($this->owner->CanViewType != 'OnlyTheseUsers') {
             $viewerGroups = $this->owner->ViewerGroups();
-            if($viewerGroups && $viewerGroups->exists()) {
+            if ($viewerGroups && $viewerGroups->exists()) {
                 $viewerGroups->removeAll();
             }
         }
-        if($this->owner->CanEditType != 'OnlyTheseUsers') {
+        if ($this->owner->CanEditType != 'OnlyTheseUsers') {
             $editorGroups = $this->owner->EditorGroups();
-            if($editorGroups && $editorGroups->exists()) {
+            if ($editorGroups && $editorGroups->exists()) {
                 $editorGroups->removeAll();
             }
         }
@@ -456,7 +469,8 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * 
      * @return SS_List
      */
-    public function ChildFoldersExcludeSecured() {
+    public function ChildFoldersExcludeSecured()
+    {
         $folders = $this->owner->ChildFolders();
         $folders = $folders->exclude("Secured", "1");
         return $folders;
@@ -466,7 +480,8 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * 
      * @return SS_List
      */
-    public function ChildFoldersOnlySecured() {
+    public function ChildFoldersOnlySecured()
+    {
         $folders = $this->owner->ChildFolders();
         $folders = $folders->filter("Secured", "1");
         return $folders;
@@ -476,12 +491,13 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * 
      * @return null | string
      */
-    public function getWhoCanViewHTML() {
-        if(!$this->owner->Secured) {
+    public function getWhoCanViewHTML()
+    {
+        if (!$this->owner->Secured) {
             return;
         }
         
-        switch($this->owner->CanViewType) {
+        switch ($this->owner->CanViewType) {
             case 'Anyone':
             case 'LoggedInUsers':
             case 'OnlyTheseUsers':
@@ -498,8 +514,9 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * 
      * @return string
      */
-    public function getWhoCanViewNice() {
-        switch($this->owner->CanViewType) {
+    public function getWhoCanViewNice()
+    {
+        switch ($this->owner->CanViewType) {
             case 'Anyone':
                 $ret = _t("FileSecured.Anyone", 'Anyone');
                 break;
@@ -508,7 +525,7 @@ class FileSecured extends DataExtension implements PermissionProvider {
                 break;
             case 'OnlyTheseUsers':
                 $theseUsers = $this->owner->ViewerGroups();
-                if($theseUsers && $theseUsers->exists()) {
+                if ($theseUsers && $theseUsers->exists()) {
                     $theseUsersNames = array();
                     foreach ($theseUsers as $user) {
                         $theseUsersNames[] = "<b>'".Convert::raw2xml($user->Title)."'</b>";
@@ -520,7 +537,7 @@ class FileSecured extends DataExtension implements PermissionProvider {
                 break;
             default:
                 $parent = Folder::get_by_id("Folder", $this->owner->ParentID);
-                if($parent && $parent->exists()) {
+                if ($parent && $parent->exists()) {
                     $ret = $parent->getWhoCanViewNice();
                 } else {
                     $ret = _t("FileSecured.Anyone", "Anyone");
@@ -533,12 +550,13 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * 
      * @return null | string
      */
-    public function getWhoCanEditHTML() {
-        if(!$this->owner->Secured) {
+    public function getWhoCanEditHTML()
+    {
+        if (!$this->owner->Secured) {
             return;
         }
         
-        switch($this->owner->CanEditType) {
+        switch ($this->owner->CanEditType) {
             case 'LoggedInUsers':
             case 'OnlyTheseUsers':
                 $ret = $this->getWhoCanEditNice();
@@ -554,14 +572,15 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * 
      * @return string
      */
-    public function getWhoCanEditNice() {
-        switch($this->owner->CanEditType) {
+    public function getWhoCanEditNice()
+    {
+        switch ($this->owner->CanEditType) {
             case 'LoggedInUsers':
                 $ret = _t("FileSecured.LoggedInUsers", 'Anyone who can login to the site');
                 break;
             case 'OnlyTheseUsers':
                 $theseUsers = $this->owner->EditorGroups();
-                if($theseUsers && $theseUsers->exists()) {
+                if ($theseUsers && $theseUsers->exists()) {
                     $theseUsersNames = array();
                     foreach ($theseUsers as $user) {
                         $theseUsersNames[] = "<b>'".Convert::raw2xml($user->Title)."'</b>";
@@ -573,7 +592,7 @@ class FileSecured extends DataExtension implements PermissionProvider {
                 break;
             default:
                 $parent = Folder::get_by_id("Folder", $this->owner->ParentID);
-                if($parent && $parent->exists()) {
+                if ($parent && $parent->exists()) {
                     $ret = $parent->getWhoCanEditNice();
                 } else {
                     $ret = _t("FileSecured.Anyone", "Anyone");
@@ -587,21 +606,24 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * 
      * @return string
      */
-    public function getEmbargoHTML() {
-        if(!$this->owner->Secured) return;
-        if($this->owner instanceof Folder) {
+    public function getEmbargoHTML()
+    {
+        if (!$this->owner->Secured) {
+            return;
+        }
+        if ($this->owner instanceof Folder) {
             $ret = "N/A";
         } else {
-            switch($this->owner->EmbargoType) {
+            switch ($this->owner->EmbargoType) {
                 case 'Indefinitely':
                     $ret = "Embargoed forever";
                     break;
                 case 'UntilAFixedDate':
-                    if($embargoDate =  $this->owner->EmbargoedUntilDate) {
+                    if ($embargoDate =  $this->owner->EmbargoedUntilDate) {
                         $datetime = new SS_Datetime();
                         $datetime->setValue($embargoDate);
                         $now = $today = date('Y-m-d H:i:s');
-                        if($embargoDate > $now) {
+                        if ($embargoDate > $now) {
                             $embargo = _t("FileSecured.EmbargoedUntil", "Embargoed, till");
                         } else {
                             $embargo = _t("FileSecured.EmbargoedNotUntil", "Not embargoed now, once embargoed until ");
@@ -626,22 +648,22 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * 
      * @return string
      */
-    public function getExpireHTML() {
-        if(!$this->owner->Secured) {
+    public function getExpireHTML()
+    {
+        if (!$this->owner->Secured) {
             return;
         }
         
-        if($this->owner instanceof Folder) {
+        if ($this->owner instanceof Folder) {
             $ret = "N/A";
         } else {
-            switch($this->owner->ExpiryType) {
+            switch ($this->owner->ExpiryType) {
                 case 'AtAFixedDate':
-                    if($expireDate =  $this->owner->ExpireAtDate) {
-
+                    if ($expireDate =  $this->owner->ExpireAtDate) {
                         $datetime = new SS_Datetime();
                         $datetime->setValue($expireDate);
                         $now = $today = date('Y-m-d H:i:s');
-                        if($expireDate > $now) {
+                        if ($expireDate > $now) {
                             $expire = _t("FileSecured.EmbargoedNotExpired", "Not expired, will expire ");
                         } else {
                             $expire = _t("FileSecured.EmbargoedExpired", "Expired ");
@@ -666,7 +688,8 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * 
      * @return array
      */
-    public function providePermissions() {
+    public function providePermissions()
+    {
         //Access to '{title}' section
         return array(
             'SECURED_FILES_VIEW_ALL' => array(
@@ -698,47 +721,48 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * @param Member|int|null $member
      * @return boolean True if the current user can view this secured file.
      */
-    public function canView($member = null) {
-        if(!$this->owner->Secured) {
+    public function canView($member = null)
+    {
+        if (!$this->owner->Secured) {
             return true;
         }
 
-        if(!$member || !(is_a($member, 'Member')) || is_numeric($member)) {
+        if (!$member || !(is_a($member, 'Member')) || is_numeric($member)) {
             $member = Member::currentUserID();
         }
 
         // admin override
-        if($member && Permission::checkMember($member, array("ADMIN", "SECURED_FILES_VIEW_ALL"))) {
+        if ($member && Permission::checkMember($member, array("ADMIN", "SECURED_FILES_VIEW_ALL"))) {
             return true;
         }
 
         // check for empty spec
-        if(!$this->owner->CanViewType || $this->owner->CanViewType == 'Anyone') {
+        if (!$this->owner->CanViewType || $this->owner->CanViewType == 'Anyone') {
             return true;
         }
 
         // check for inherit
-        if($this->owner->CanViewType == 'Inherit') {
-            if($this->owner->ParentID) {
+        if ($this->owner->CanViewType == 'Inherit') {
+            if ($this->owner->ParentID) {
                 return $this->owner->Parent()->canView($member);
             }
             return true;
         }
 
         // check for any logged-in users
-        if($this->owner->CanViewType == 'LoggedInUsers' && $member) {
+        if ($this->owner->CanViewType == 'LoggedInUsers' && $member) {
             // Standard asset-admin permissions should not get you into the CMS' secured-area
-            if(Permission::checkMember($member, array("CMS_ACCESS_AssetAdmin"))) {
+            if (Permission::checkMember($member, array("CMS_ACCESS_AssetAdmin"))) {
                 return false;
             }
             return true;
         }
 
         // check for specific groups
-        if($member && is_numeric($member)) {
+        if ($member && is_numeric($member)) {
             $member = DataObject::get_by_id('Member', $member);
         }
-        if(
+        if (
             $this->owner->CanViewType == 'OnlyTheseUsers'
             && $member
             && $member->inGroups($this->owner->ViewerGroups())
@@ -765,11 +789,11 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * @param Member $member Set to FALSE if you want to explicitly test permissions without a valid user (useful for unit tests)
      * @return boolean True if the current user can edit this secured file.
      */
-    public function canEdit($member = null) {
-        if($member instanceof Member) {
+    public function canEdit($member = null)
+    {
+        if ($member instanceof Member) {
             $memberID = $member->ID;
-        }
-        else if(is_numeric($member)) {
+        } elseif (is_numeric($member)) {
             $memberID = $member;
             $member = DataObject::get_by_id('Member', $memberID);
         } else {
@@ -777,15 +801,15 @@ class FileSecured extends DataExtension implements PermissionProvider {
             $memberID = Member::currentUserID();
         }
 
-        if($memberID && !$this->owner->Secured || !$this->owner->ID) {
+        if ($memberID && !$this->owner->Secured || !$this->owner->ID) {
             return true;
         }
 
-        if($memberID && Permission::checkMember($memberID, array("ADMIN", "SECURED_FILES_EDIT_ALL"))) {
+        if ($memberID && Permission::checkMember($memberID, array("ADMIN", "SECURED_FILES_EDIT_ALL"))) {
             return true;
         }
 
-        if($this->owner->ID) {
+        if ($this->owner->ID) {
             // Regular canEdit logic is handled by can_edit_multiple
             $results = self::can_edit_multiple(array($this->owner->ID), $memberID);
 
@@ -803,14 +827,15 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * @param Member $member
      * @return boolean True if the current user can create secured file.
      */
-    public function canCreate($member = null) {
-        if(!$member || !(is_a($member, 'Member')) || is_numeric($member)) {
+    public function canCreate($member = null)
+    {
+        if (!$member || !(is_a($member, 'Member')) || is_numeric($member)) {
             $member = Member::currentUserID();
         }
-        if($member && (!$this->owner->Secured || !$this->owner->ID)) {
+        if ($member && (!$this->owner->Secured || !$this->owner->ID)) {
             return true;
         }
-        if($member && Permission::checkMember($member, array("ADMIN", "CMS_ACCESS_SecuredAssetAdmin", "SECURED_FILES_EDIT_ALL"))) {
+        if ($member && Permission::checkMember($member, array("ADMIN", "CMS_ACCESS_SecuredAssetAdmin", "SECURED_FILES_EDIT_ALL"))) {
             return true;
         }
         return false;
@@ -829,16 +854,17 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * @param Member $member
      * @return boolean True if the current user can delete this secured file.
      */
-    public function canDelete($member = null) {
-        if($member instanceof Member) {
+    public function canDelete($member = null)
+    {
+        if ($member instanceof Member) {
             $memberID = $member->ID;
-        } else if(is_numeric($member)) {
+        } elseif (is_numeric($member)) {
             $memberID = $member;
         } else {
             $memberID = Member::currentUserID();
         }
 
-        if($memberID && Permission::checkMember($memberID, array("ADMIN", "SECURED_FILES_EDIT_ALL"))) {
+        if ($memberID && Permission::checkMember($memberID, array("ADMIN", "SECURED_FILES_EDIT_ALL"))) {
             return true;
         }
 
@@ -858,17 +884,18 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * @param bool $useCached Return values from the permission cache if they exist.
      * @return array
      */
-    public static function can_delete_multiple($ids, $memberID, $useCached = true) {
+    public static function can_delete_multiple($ids, $memberID, $useCached = true)
+    {
         $result = array_fill_keys($ids, false);
         $cacheKey = "delete-$memberID";
 
         // Look in the cache for values
-        if($useCached && isset(self::$cache_permissions[$cacheKey])) {
+        if ($useCached && isset(self::$cache_permissions[$cacheKey])) {
             $cachedValues = array_intersect_key(self::$cache_permissions[$cacheKey], $result);
 
             // If we can't find everything in the cache, then look up the remainder separately
             $uncachedValues = array_diff_key($result, self::$cache_permissions[$cacheKey]);
-            if($uncachedValues) {
+            if ($uncachedValues) {
                 $cachedValues = self::can_delete_multiple(array_keys($uncachedValues), $memberID, false)
                     + $cachedValues;
             }
@@ -877,12 +904,12 @@ class FileSecured extends DataExtension implements PermissionProvider {
         
         // You can only delete pages that you can edit
         $editableIDs = array_keys(array_filter(self::can_edit_multiple($ids, $memberID)));
-        if($editableIDs) {
+        if ($editableIDs) {
             $idList = implode(",", $editableIDs);
 
             // You can only delete pages whose children you can delete
             $childRecords = DataObject::get("File", "\"ParentID\" IN ($idList)");
-            if($childRecords) {
+            if ($childRecords) {
                 $children = $childRecords->map("ID", "ParentID");
 
                 // Find out the children that can be deleted
@@ -890,8 +917,10 @@ class FileSecured extends DataExtension implements PermissionProvider {
 
                 // Get a list of all the parents that have no undeletable children
                 $deletableParents = array_fill_keys($editableIDs, true);
-                foreach($deletableChildren as $id => $canDelete) {
-                    if(!$canDelete) unset($deletableParents[$children[$id]]);
+                foreach ($deletableChildren as $id => $canDelete) {
+                    if (!$canDelete) {
+                        unset($deletableParents[$children[$id]]);
+                    }
                 }
 
                 // Use that to filter the list of deletable parents that have children
@@ -903,7 +932,6 @@ class FileSecured extends DataExtension implements PermissionProvider {
 
                 // Combine the two
                 $deletable = array_merge($deletableParents, $deletableLeafNodes);
-
             } else {
                 $deletable = $editableIDs;
             }
@@ -925,7 +953,8 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * @return array A map where the IDs are keys and the values are booleans stating whether the given
      * page can be edited.
      */
-    public static function can_edit_multiple($ids, $memberID, $useCached = true) {
+    public static function can_edit_multiple($ids, $memberID, $useCached = true)
+    {
         return self::batch_permission_check($ids, $memberID, 'CanEditType', 'File_EditorGroups', null, $useCached);
     }
 
@@ -947,9 +976,10 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * @return array An map of {@link File} ID keys, to boolean values
      * @todo Add test(s)
      */
-    public static function batch_permission_check($ids, $memberID, $typeField, 
-            $groupJoinTable, $globalPermission = null, $useCached = true) {
-        if($globalPermission === NULL) {
+    public static function batch_permission_check($ids, $memberID, $typeField,
+            $groupJoinTable, $globalPermission = null, $useCached = true)
+    {
+        if ($globalPermission === null) {
             $globalPermission = array('CMS_ACCESS_LeftAndMain', 'CMS_ACCESS_SecuredAssetAdmin');
         }
 
@@ -962,21 +992,21 @@ class FileSecured extends DataExtension implements PermissionProvider {
 
         // Default result: nothing editable
         $result = array_fill_keys($ids, false);
-        if($ids) {
+        if ($ids) {
             // Look in the cache for values
-            if($useCached && isset(self::$cache_permissions[$cacheKey])) {
+            if ($useCached && isset(self::$cache_permissions[$cacheKey])) {
                 $cachedValues = array_intersect_key(self::$cache_permissions[$cacheKey], $result);
 
                 // If we can't find everything in the cache, then look up the remainder separately
                 $uncachedValues = array_diff_key($result, self::$cache_permissions[$cacheKey]);
-                if($uncachedValues) {
+                if ($uncachedValues) {
                     $cachedValues = self::batch_permission_check(array_keys($uncachedValues), $memberID, $typeField, $groupJoinTable, $globalPermission, false) + $cachedValues;
                 }
                 return $cachedValues;
             }
 
             // If a member doesn't have a certain permission then they can't edit anything
-            if(!$memberID || ($globalPermission && !Permission::checkMember($memberID, $globalPermission))) {
+            if (!$memberID || ($globalPermission && !Permission::checkMember($memberID, $globalPermission))) {
                 return $result;
             }
 
@@ -989,7 +1019,7 @@ class FileSecured extends DataExtension implements PermissionProvider {
             // Get the groups that the given member belongs to
             $groupIDs = DataObject::get_by_id('Member', $memberID)->Groups()->column("ID");
             $SQL_groupList = implode(", ", $groupIDs);
-            if(!$SQL_groupList) {
+            if (!$SQL_groupList) {
                 $SQL_groupList = '0';
             }
 
@@ -1010,7 +1040,7 @@ class FileSecured extends DataExtension implements PermissionProvider {
                     AND \"File\".\"ID\" IN ($SQL_idList)")
                 ->leftJoin($groupJoinTable, "\"$groupJoinTable\".\"FileID\" = \"File\".\"ID\" AND \"$groupJoinTable\".\"GroupID\" IN ($SQL_groupList)");
 
-            if($uninheritedPermissions) {
+            if ($uninheritedPermissions) {
                 // Set all the relevant items in $result to true
                 $result = array_fill_keys($uninheritedPermissions->column('ID'), true) + $result;
             }
@@ -1019,22 +1049,24 @@ class FileSecured extends DataExtension implements PermissionProvider {
             $potentiallyInherited = DataObject::get("File", "\"$typeField\" = 'Inherit'
                 AND \"File\".\"ID\" IN ($SQL_idList)");
 
-            if($potentiallyInherited) {
+            if ($potentiallyInherited) {
                 // Group $potentiallyInherited by ParentID; we'll look at the permission of all those
                 // parents and then see which ones the user has permission on
                 $groupedByParent = array();
-                foreach($potentiallyInherited as $item) {
-                    if($item->ParentID) {
-                        if(!isset($groupedByParent[$item->ParentID])) $groupedByParent[$item->ParentID] = array();
+                foreach ($potentiallyInherited as $item) {
+                    if ($item->ParentID) {
+                        if (!isset($groupedByParent[$item->ParentID])) {
+                            $groupedByParent[$item->ParentID] = array();
+                        }
                         $groupedByParent[$item->ParentID][] = $item->ID;
                     }
                 }
 
-                if($groupedByParent) {
+                if ($groupedByParent) {
                     $actuallyInherited = self::batch_permission_check(array_keys($groupedByParent), $memberID, $typeField, $groupJoinTable);
-                    if($actuallyInherited) {
+                    if ($actuallyInherited) {
                         $parentIDs = array_keys(array_filter($actuallyInherited));
-                        foreach($parentIDs as $parentID) {
+                        foreach ($parentIDs as $parentID) {
                             // Set all the relevant items in $result to true
                             $result = array_fill_keys($groupedByParent[$parentID], true) + $result;
                         }
@@ -1045,9 +1077,9 @@ class FileSecured extends DataExtension implements PermissionProvider {
             $combinedResult = $combinedResult + $result;
         }
 
-        if(isset($combinedResult)) {
+        if (isset($combinedResult)) {
             // Cache the results
-            if(empty(self::$cache_permissions[$cacheKey])) {
+            if (empty(self::$cache_permissions[$cacheKey])) {
                 self::$cache_permissions[$cacheKey] = array();
             }
             self::$cache_permissions[$cacheKey] = $combinedResult + self::$cache_permissions[$cacheKey];
@@ -1062,7 +1094,8 @@ class FileSecured extends DataExtension implements PermissionProvider {
      * 
      * @return boolean
      */
-    private function isFile() {
-        return !is_a($this->owner,"Folder") && is_a($this->owner, "File");
+    private function isFile()
+    {
+        return !is_a($this->owner, "Folder") && is_a($this->owner, "File");
     }
 }

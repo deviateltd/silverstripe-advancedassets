@@ -7,7 +7,8 @@
  * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
  * @package silverstripe-advancedassets
  */
-class AdvancedAssetsFilesSiteConfig extends DataExtension {
+class AdvancedAssetsFilesSiteConfig extends DataExtension
+{
     
     /**
      *
@@ -56,15 +57,16 @@ class AdvancedAssetsFilesSiteConfig extends DataExtension {
      * @throws AdvancedAssetsException
      * @return boolean
      */
-    private static function is_component_enabled($component) {
+    private static function is_component_enabled($component)
+    {
         $component = strtolower(trim($component));
-        if(!in_array($component, self::$allowed_components)) {
+        if (!in_array($component, self::$allowed_components)) {
             throw new AdvancedAssetsException('Component not allowed.');
         }
         
         $componentKey = 'component_' . $component . '_enabled';
         $setting = Config::inst()->get('AdvancedAssetsFilesSiteConfig', $componentKey);
-        if($setting !== null) {
+        if ($setting !== null) {
             return (bool)$setting;
         }
         
@@ -75,7 +77,8 @@ class AdvancedAssetsFilesSiteConfig extends DataExtension {
      * 
      * @return boolean
      */
-    public static function is_security_enabled() {
+    public static function is_security_enabled()
+    {
         return self::is_component_enabled('security');
     }
     
@@ -83,7 +86,8 @@ class AdvancedAssetsFilesSiteConfig extends DataExtension {
      * 
      * @return boolean
      */
-    public static function is_metadata_enabled() {
+    public static function is_metadata_enabled()
+    {
         return self::is_component_enabled('metadata');
     }
     
@@ -91,7 +95,8 @@ class AdvancedAssetsFilesSiteConfig extends DataExtension {
      * 
      * @return boolean
      */
-    public static function is_embargoexpiry_enabled() {
+    public static function is_embargoexpiry_enabled()
+    {
         return self::is_component_enabled('embargoexpiry');
     }
     
@@ -103,12 +108,13 @@ class AdvancedAssetsFilesSiteConfig extends DataExtension {
      * @param string $component
      * @return string
      */
-    public static function component_cms_icon($component) {
+    public static function component_cms_icon($component)
+    {
         $enabled = (self::is_component_enabled($component) ? 'en' : 'dis') . 'abled';
         $title = ucfirst($component) . ' component ' . $enabled . '.';
-        return '<span class="component-icon ' 
-            . $component . ' ' 
-            . $enabled . '" title="' . $title 
+        return '<span class="component-icon '
+            . $component . ' '
+            . $enabled . '" title="' . $title
             . '">&nbsp;</span>';
     }
 
@@ -117,7 +123,8 @@ class AdvancedAssetsFilesSiteConfig extends DataExtension {
      * @param FieldList $fields
      * @return void
      */
-    public function updateCMSFields(FieldList $fields){
+    public function updateCMSFields(FieldList $fields)
+    {
         $fields->addFieldsToTab("Root.AdvancedAssets", array(
             UploadField::create('LockpadImageNeedLogIn', 'Lockpad image that shows "need to login"')
                 ->setDescription("Image that shows as default when a image is required to login to view")

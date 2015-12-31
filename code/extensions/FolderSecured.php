@@ -12,7 +12,8 @@
  * @package silverstripe-advancedassets
  * @todo How many of the "cloned" methods/props from {@link Folder} are actually neeed?
  */
-class FolderSecured extends DataExtension {
+class FolderSecured extends DataExtension
+{
     
     /**
      * 
@@ -20,7 +21,8 @@ class FolderSecured extends DataExtension {
      * 
      * @return array
      */
-    public function securedSyncChildren() {
+    public function securedSyncChildren()
+    {
         $parentID = (int)$this->owner->ID; // parentID = 0 on the singleton, used as the 'root node';
         $added = 0;
         $deleted = 0;
@@ -28,7 +30,7 @@ class FolderSecured extends DataExtension {
 
         // First, merge any children that are duplicates
         //customised
-        if($parentID === 0) {
+        if ($parentID === 0) {
             //make sure there are no merges between a secured folder and non-secured folder.
             //there is only one case that there are both secured child folder and non-secured child folder exists,
             //that is when $this->owner is on assets root.
@@ -39,16 +41,16 @@ class FolderSecured extends DataExtension {
                 . " WHERE \"ParentID\" = $parentID GROUP BY \"Name\" HAVING count(*) > 1")->column();
         }
         
-        if($duplicateChildrenNames) {
-            foreach($duplicateChildrenNames as $childName) {
+        if ($duplicateChildrenNames) {
+            foreach ($duplicateChildrenNames as $childName) {
                 $childName = Convert::raw2sql($childName);
                 // Note, we do this in the database rather than object-model; otherwise we get all sorts of problems
                 // about deleting files
                 $children = DB::query("SELECT \"ID\" FROM \"File\""
                     . " WHERE \"Name\" = '$childName' AND \"ParentID\" = $parentID")->column();
-                if($children) {
+                if ($children) {
                     $keptChild = array_shift($children);
-                    foreach($children as $removedChild) {
+                    foreach ($children as $removedChild) {
                         DB::query("UPDATE \"File\" SET \"ParentID\" = $keptChild WHERE \"ParentID\" = $removedChild");
                         DB::query("DELETE FROM \"File\" WHERE \"ID\" = $removedChild");
                     }
@@ -64,10 +66,12 @@ class FolderSecured extends DataExtension {
         $dbChildren = DB::query("SELECT * FROM \"File\" WHERE \"ParentID\" = $parentID");
         $hasDbChild = array();
 
-        if($dbChildren) {
-            foreach($dbChildren as $dbChild) {
+        if ($dbChildren) {
+            foreach ($dbChildren as $dbChild) {
                 $className = $dbChild['ClassName'];
-                if(!$className) $className = "File";
+                if (!$className) {
+                    $className = "File";
+                }
                 $hasDbChild[$dbChild['Name']] = new $className($dbChild);
             }
         }
@@ -76,7 +80,7 @@ class FolderSecured extends DataExtension {
         // if we're syncing a folder with no ID, we assume we're syncing the root assets folder
         // however the Filename field is populated with "NewFolder", so we need to set this to empty
         // to satisfy the baseDir variable below, which is the root folder to scan for new files in
-        if(!$parentID) {
+        if (!$parentID) {
             $this->owner->Filename = '';
         }
 
@@ -84,39 +88,41 @@ class FolderSecured extends DataExtension {
         $baseDir = $this->owner->FullPath;
 
         // @todo this shouldn't call die() but log instead
-        if($parentID && !$this->owner->Filename) die($this->owner->ID . " - " . $this->owner->FullPath);
+        if ($parentID && !$this->owner->Filename) {
+            die($this->owner->ID . " - " . $this->owner->FullPath);
+        }
 
-        if(file_exists($baseDir)) {
+        if (file_exists($baseDir)) {
             $actualChildren = scandir($baseDir);
             $ignoreRules = Config::inst()->get('Filesystem', 'sync_blacklisted_patterns');
-            foreach($actualChildren as $actualChild) {
-                if($ignoreRules) {
+            foreach ($actualChildren as $actualChild) {
+                if ($ignoreRules) {
                     $skip = false;
 
-                    foreach($ignoreRules as $rule) {
-                        if(preg_match($rule, $actualChild)) {
+                    foreach ($ignoreRules as $rule) {
+                        if (preg_match($rule, $actualChild)) {
                             $skip = true;
                             break;
                         }
                     }
 
-                    if($skip) {
+                    if ($skip) {
                         $skipped++;
                         continue;
                     }
                 }
 
                 // A record with a bad class type doesn't deserve to exist. It must be purged!
-                if(isset($hasDbChild[$actualChild])) {
+                if (isset($hasDbChild[$actualChild])) {
                     $child = $hasDbChild[$actualChild];
-                    if(( !( $child instanceof Folder ) && is_dir($baseDir . $actualChild) )
-                        || (( $child instanceof Folder ) && !is_dir($baseDir . $actualChild)) ) {
+                    if ((!($child instanceof Folder) && is_dir($baseDir . $actualChild))
+                        || (($child instanceof Folder) && !is_dir($baseDir . $actualChild))) {
                         DB::query("DELETE FROM \"File\" WHERE \"ID\" = $child->ID");
                         unset($hasDbChild[$actualChild]);
                     }
                 }
 
-                if(isset($hasDbChild[$actualChild])) {
+                if (isset($hasDbChild[$actualChild])) {
                     $child = $hasDbChild[$actualChild];
                     unset($unwantedDbChildren[$actualChild]);
                 } else {
@@ -125,12 +131,12 @@ class FolderSecured extends DataExtension {
                     $child = DataObject::get_by_id("File", $childID);
                 }
 
-                if($child && is_dir($baseDir . $actualChild)) {
+                if ($child && is_dir($baseDir . $actualChild)) {
                     //customised
                     //when we synch on assets root
                     //we don't want to sync the secured root folder SECURED_FILES_ASSET_SUBDIR
                     //This is only the case where both secured child folder and non-secured child folder exist
-                    if($parentID === 0 && $child->ID === FileSecured::getSecuredRoot()->ID) {
+                    if ($parentID === 0 && $child->ID === FileSecured::getSecuredRoot()->ID) {
                         $skipped ++;
                     } else {
                         //customised
@@ -140,7 +146,6 @@ class FolderSecured extends DataExtension {
                         $deleted += $childResult['deleted'];
                         $skipped += $childResult['skipped'];
                     }
-
                 }
 
                 // Clean up the child record from memory after use. Important!
@@ -149,9 +154,11 @@ class FolderSecured extends DataExtension {
             }
 
             // Iterate through the unwanted children, removing them all
-            if(isset($unwantedDbChildren)) foreach($unwantedDbChildren as $unwantedDbChild) {
-                DB::query("DELETE FROM \"File\" WHERE \"ID\" = $unwantedDbChild->ID");
-                $deleted++;
+            if (isset($unwantedDbChildren)) {
+                foreach ($unwantedDbChildren as $unwantedDbChild) {
+                    DB::query("DELETE FROM \"File\" WHERE \"ID\" = $unwantedDbChild->ID");
+                    $deleted++;
+                }
             }
         } else {
             DB::query("DELETE FROM \"File\" WHERE \"ID\" = $this->owner->ID");
@@ -169,22 +176,23 @@ class FolderSecured extends DataExtension {
      * @param string $name
      * @return number
      */
-    public function constructChildSecuredWithSecuredFlag($name) {
+    public function constructChildSecuredWithSecuredFlag($name)
+    {
         // Determine the class name - File, Folder or Image
         $baseDir = $this->owner->FullPath;
-        if(is_dir($baseDir . $name)) {
+        if (is_dir($baseDir . $name)) {
             $className = "Folder";
         } else {
             $className = File::get_class_for_file_extension(pathinfo($name, PATHINFO_EXTENSION));
         }
 
         $ownerID = 0;
-        if(Member::currentUser()) {
+        if (Member::currentUser()) {
             $ownerID = Member::currentUser()->ID;
         }
 
         $filename = Convert::raw2sql($this->owner->Filename . $name);
-        if($className == 'Folder' ) {
+        if ($className == 'Folder') {
             $filename .= '/';
         }
 

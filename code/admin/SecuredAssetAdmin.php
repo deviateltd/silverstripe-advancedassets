@@ -11,7 +11,8 @@
  * @see {@link FileSecured} and {@link FolderSecured}.
  * @todo Modify addFolder() and initValidate() to show messages within the CMS.
  */
-class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
+class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider
+{
 
     /**
      *
@@ -62,7 +63,8 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      * 
      * @return void
      */
-    public function init() {
+    public function init()
+    {
         self::instantiate();
         parent::init();
         $this->initValidate();
@@ -75,12 +77,13 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      * @return SS_HTTPResponse
      * @todo Refactor into single static. There are v.close dupes of this in the other controllers.
      */
-    public function initValidate() {
+    public function initValidate()
+    {
         $folderId = SecuredFilesystem::get_numeric_identifier($this, 'ID');
-        if($folderId) {
+        if ($folderId) {
             $folder = DataObject::get_by_id("Folder", $folderId);
-            if($folder && $folder->exists()) {
-                if(!$folder->Secured) {
+            if ($folder && $folder->exists()) {
+                if (!$folder->Secured) {
                     $message = _t('SecuredFilesystem.messages.ERROR_ACCESS_ONLY_IN_FILES');
                     return SecuredFilesystem::show_access_message($this, $message);
                 }
@@ -95,20 +98,21 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      * 
      * @return void
      */
-    public static function instantiate() {
+    public static function instantiate()
+    {
         $secured_root_folder = BASE_PATH . DIRECTORY_SEPARATOR . ASSETS_DIR . DIRECTORY_SEPARATOR . SECURED_FILES_ASSET_SUBDIR;
-        if(!is_dir($secured_root_folder)) {
+        if (!is_dir($secured_root_folder)) {
             FileSecured::find_or_make_secured(SECURED_FILES_ASSET_SUBDIR . DIRECTORY_SEPARATOR . "Uploads");
         }
 
         $resource_folder = BASE_PATH . DIRECTORY_SEPARATOR . SECURED_FILES_MODULE_DIR . DIRECTORY_SEPARATOR . 'resource';
         $default_lock_images_folder = BASE_PATH . DIRECTORY_SEPARATOR . ASSETS_DIR . DIRECTORY_SEPARATOR . '_defaultlockimages';
-        if(!is_dir($default_lock_images_folder)) {
+        if (!is_dir($default_lock_images_folder)) {
             mkdir($default_lock_images_folder, Config::inst()->get('Filesystem', 'folder_create_mask'));
             $resource_images_folder = $resource_folder . DIRECTORY_SEPARATOR . 'images';
             $dir = dir($resource_images_folder);
-            while(false !== $entry = $dir->read()) {
-                if($entry == '.' || $entry == '..') {
+            while (false !== $entry = $dir->read()) {
+                if ($entry == '.' || $entry == '..') {
                     continue;
                 }
                 copy($resource_images_folder . DIRECTORY_SEPARATOR . $entry, $default_lock_images_folder . DIRECTORY_SEPARATOR . $entry);
@@ -122,7 +126,8 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      * 
      * @return SS_List
      */
-    public function getList() {
+    public function getList()
+    {
         $list = parent::getList();
         $list = $list->filter("Secured", 1);
         $securedRoot = FileSecured::getSecuredRoot();
@@ -137,16 +142,17 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      * 
      * @return number
      */
-    public function currentPageID() {
-        if(is_numeric($this->request->requestVar('ID'))) {
+    public function currentPageID()
+    {
+        if (is_numeric($this->request->requestVar('ID'))) {
             return $this->request->requestVar('ID');
-        } elseif(is_numeric($this->urlParams['ID'])) {
+        } elseif (is_numeric($this->urlParams['ID'])) {
             return $this->urlParams['ID'];
-        } elseif(Session::get("{$this->class}.currentPage")) {
+        } elseif (Session::get("{$this->class}.currentPage")) {
             return Session::get("{$this->class}.currentPage");
         } else {
             $securedRoot = FileSecured::getSecuredRoot();
-            if($securedRoot && $securedRoot->exists()) {
+            if ($securedRoot && $securedRoot->exists()) {
                 return $securedRoot->ID;
             } else {
                 SecuredAssetAdmin::instantiate();
@@ -162,9 +168,11 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      * @param FieldList $fields
      * @return Form
      */
-    public function getEditForm($id = null, $fields = null) {
-        if(!$id)
+    public function getEditForm($id = null, $fields = null)
+    {
+        if (!$id) {
             $id = $this->currentPageID();
+        }
         $form = parent::getEditForm($id, $fields);
         $folder = ($id && is_numeric($id) && $id > 0) ? DataObject::get_by_id('Folder', $id, false) : $this->currentPage();
         $gridField = $form->Fields()->dataFieldByName('File');
@@ -187,7 +195,7 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
             'WhoCanEditHTML' => 'HTMLText->RAW',
         ));
 
-        if($id == FileSecured::getSecuredRoot()->ID) {
+        if ($id == FileSecured::getSecuredRoot()->ID) {
             $form->Fields()->removeByName("DetailsView");
             $config->removeComponentsByType("GridFieldLevelup");
         } else {
@@ -195,18 +203,18 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
         }
 
         $gridField->setTitle(_t("SECUREDASSETADMIN.SecuriedFiles", "Advanced Assets"));
-        if($id == FileSecured::getSecuredRoot()->ID) {
+        if ($id == FileSecured::getSecuredRoot()->ID) {
             $form->Fields()->removeByName("DetailsView");
         }
 
         // Need to use CMSSecuredFileAddController, so update the "Upload" button.
-        if($folder->canCreate()) {
+        if ($folder->canCreate()) {
             $uploadBtn = new LiteralField(
                     'UploadButton', sprintf(
                             '<a class="ss-ui-button ss-ui-action-constructive cms-panel-link"'
                             . ' data-pjax-target="Content" data-icon="drive-upload"'
-                            . ' href="%s">%s</a>', 
-                            Controller::join_links(singleton('CMSSecuredFileAddController')->Link(), '?ID=' . $folder->ID), 
+                            . ' href="%s">%s</a>',
+                            Controller::join_links(singleton('CMSSecuredFileAddController')->Link(), '?ID=' . $folder->ID),
                             _t('Folder.UploadFilesButton', 'Upload')
                     )
             );
@@ -214,14 +222,14 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
             $uploadBtn = null;
         }
 
-        foreach(array("ListView", "TreeView") as $viewName) {
+        foreach (array("ListView", "TreeView") as $viewName) {
             $view = $form->Fields()->fieldByName("Root." . $viewName);
-            foreach($view->Fields() as $f) {
-                if($f instanceof CompositeField) {
-                    foreach($f->FieldList() as $cf) {
-                        if($cf instanceof CompositeField) {
+            foreach ($view->Fields() as $f) {
+                if ($f instanceof CompositeField) {
+                    foreach ($f->FieldList() as $cf) {
+                        if ($cf instanceof CompositeField) {
                             $cf->removeByName("UploadButton");
-                            if($uploadBtn) {
+                            if ($uploadBtn) {
                                 $cf->insertBefore($uploadBtn, "AddFolderButton");
                             }
                         }
@@ -237,7 +245,8 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      * 
      * @return SS_List
      */
-    public function SiteTreeAsUL() {
+    public function SiteTreeAsUL()
+    {
         $root = FileSecured::getSecuredRoot();
         return $this->getSiteTreeFor($this->stat('tree_class'), $root->ID, 'ChildFoldersOnlySecured');
     }
@@ -247,18 +256,19 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      * @param boolean $unlinked
      * @return ArrayList
      */
-    public function Breadcrumbs($unlinked = false) {
+    public function Breadcrumbs($unlinked = false)
+    {
         $itemsDefault = parent::Breadcrumbs($unlinked);
 
         $items = new ArrayList();
         $i = 0;
-        foreach($itemsDefault as $item) {
-            if($i !== 0) {
+        foreach ($itemsDefault as $item) {
+            if ($i !== 0) {
                 $items->push($item);
             }
             $i++;
         }
-        if(isset($items[0]->Title)) {
+        if (isset($items[0]->Title)) {
             $items[0]->Title = _t("SECUREDASSETADMIN.SecuriedFiles", SECURED_FILES_MODULE_NAME);
         }
 
@@ -269,7 +279,8 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      * 
      * @return array
      */
-    public function providePermissions() {
+    public function providePermissions()
+    {
         $title = _t("SECUREDASSETADMIN.MENUTITLE", LeftAndMain::menu_title_for_class($this->class));
         return array(
             "CMS_ACCESS_SecuredAssetAdmin" => array(
@@ -286,7 +297,8 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      * 
      * @return null
      */
-    public function doSync() {
+    public function doSync()
+    {
         $securedRoot = FileSecured::getSecuredRoot();
         $message = SecuredFilesystem::sync_secured($securedRoot->ID);
         $this->response->addHeader('X-Status', rawurlencode($message));
@@ -300,11 +312,12 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      * @param SS_HTTPRequest $request
      * @return HTMLText
      */
-    public function addfolder($request) {
+    public function addfolder($request)
+    {
         $parentId = SecuredFilesystem::get_numeric_identifier($this, 'ParentID');
         $folder = DataObject::get_by_id("Folder", $parentId);
-        if($folder && $folder->exists()) {
-            if(!$folder->Secured) {
+        if ($folder && $folder->exists()) {
+            if (!$folder->Secured) {
                 $message = _t('SecuredFilesystem.messages.ERROR_ACCESS_ONLY_IN_FILES');
                 return SecuredFilesystem::show_access_message($this, $message);
             }
@@ -324,9 +337,10 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      * @param string $folderRes
      * @return void
      */
-    public static function write_config_files($folderSec, $folderRes) {
+    public static function write_config_files($folderSec, $folderRes)
+    {
         // Take the dummy config files from the module's root dir, then populate and move
-        if(!file_exists($folderSec . DIRECTORY_SEPARATOR . '.htaccess')) {
+        if (!file_exists($folderSec . DIRECTORY_SEPARATOR . '.htaccess')) {
             $data = new ArrayData(array(
                 'base' => BASE_URL ? BASE_URL : '/',
                 'frameworkDir' => FRAMEWORK_DIR,
@@ -339,5 +353,4 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
             file_put_contents($folderSec . DIRECTORY_SEPARATOR . 'web.config', $webDotConfig->getValue());
         }
     }
-
 }
