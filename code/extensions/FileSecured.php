@@ -4,13 +4,16 @@
  * Extends {@link File} "transforming" it into an (optionally) secure object with
  * related canXX() methods.
  * 
- * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
+ * @author Deviate Ltd 2014-2016 http://www.deviate.net.nz
  * @package silverstripe-advancedassets
  * @todo How many of the "cloned" methods/props from {@link File} are actually needed?
  * @todo Refactor canXX() methods to use bitwise logic to make checks far less fallible
  */
 class FileSecured extends DataExtension implements PermissionProvider {
-    
+
+    /**
+     * @var array
+     */
     private static $db = array(
         "Secured" => "Boolean",
         "CanViewType" => "Enum('Anyone,LoggedInUsers,OnlyTheseUsers,Inherit', 'Inherit')",
@@ -21,6 +24,9 @@ class FileSecured extends DataExtension implements PermissionProvider {
         "ExpireAtDate" => 'SS_DateTime'
     );
 
+    /**
+     * @var array
+     */
     private static $many_many = array(
         "ViewerGroups" => "Group",
         "EditorGroups" => "Group",
@@ -216,7 +222,7 @@ class FileSecured extends DataExtension implements PermissionProvider {
             $parentIDField = $fields->dataFieldByName("ParentID");
             if($controller instanceof SecuredAssetAdmin) {
                 $securedRoot = FileSecured::getSecuredRoot();
-                $parentIDField-> setTreeBaseID($securedRoot->ID);
+                $parentIDField->setTreeBaseID($securedRoot->ID);
                 $parentIDField->setFilterFunction(create_function('$node', "return \$node->Secured == 1;"));
             } else {
                 $parentIDField->setFilterFunction(create_function('$node', "return \$node->Secured == 0;"));

@@ -17,6 +17,23 @@ class FileSecuredTest extends FunctionalTest {
     protected static $fixture_file = 'fixtures/FileSecuredTest.yml';
 
     /**
+     * @var string
+     */
+    protected static $test_folder = 'test-secured';
+
+    /**
+     * Remove test dir(s) after test runs
+     */
+    public function tearDown() {
+        $testFolder = ASSETS_PATH . '/' . self::$test_folder;
+        if(file_exists($testFolder)) {
+            rmdir($testFolder);
+        }
+
+        parent::tearDown();
+    }
+
+    /**
      * Can ADMIN CMS users, view individual SECURED files in the CMS?
      */
     public function testCanViewInCMSAsAdmin() {
@@ -427,7 +444,7 @@ class FileSecuredTest extends FunctionalTest {
         $file = $this->createSecuredFile('CanViewType', 'Anyone');
         $this->assertTrue($file->canViewFrontByUser($member));
     }
-    
+
     /**
      * Utility method.
      * 
@@ -473,7 +490,7 @@ class FileSecuredTest extends FunctionalTest {
      * @return Folder
      */
     private function createSecuredFolder($can, $type, $props = array()) {
-        $folder = Folder::create();
+        $folder = Folder::find_or_make(self::$test_folder);
         $folder->Secured = true;
         $folder->$can = $type;
         $folder->ParentID = 1;
