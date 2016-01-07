@@ -7,7 +7,8 @@
  * @package silverstripe-advancedassets
  * @todo Modify addFolder() and initValidate() to show messages within the CMS.
  */
-class NonSecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
+class NonSecuredAssetAdmin extends AssetAdmin implements PermissionProvider
+{
     
     /**
      *
@@ -41,7 +42,8 @@ class NonSecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      * 
      * @return void
      */
-    public function init() {
+    public function init()
+    {
         parent::init();
         $this->initValidate();
     }
@@ -53,12 +55,13 @@ class NonSecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      * @return SS_HTTPResponse
      * @todo Refactor into single static. There are v.close dupes of this in the other controllers.
      */
-    public function initValidate() {
+    public function initValidate()
+    {
         $id = SecuredFilesystem::get_numeric_identifier($this, 'ID');
-        if($id) {
+        if ($id) {
             $folder = DataObject::get_by_id("Folder", $id);
-            if($folder && $folder->exists()) {
-                if($folder->Secured) {
+            if ($folder && $folder->exists()) {
+                if ($folder->Secured) {
                     $message = _t('SecuredFilesystem.messages.ERROR_ACCESS_ONLY_IN_SECURED_FILES');
                     return SecuredFilesystem::show_access_message($this, $message);
                 }
@@ -72,7 +75,8 @@ class NonSecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
     /**
      * @return array
      */
-    public function providePermissions() {
+    public function providePermissions()
+    {
         $title = _t('NonSecuredAssetAdmin.labels.CMS_PERMISSIONS_LABEL_FILES_ADVANCED', 'Files (Advanced)');
         return array(
             "CMS_ACCESS_NonSecuredAssetAdmin" => array(
@@ -86,7 +90,8 @@ class NonSecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      * 
      * @return SS_List
      */
-    public function getList() {
+    public function getList()
+    {
         $list = parent::getList();
         $list = $list->exclude("Secured", "1");
         return $list;
@@ -96,7 +101,8 @@ class NonSecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      * 
      * @return SS_List
      */
-    public function SiteTreeAsUL() {
+    public function SiteTreeAsUL()
+    {
         return $this->getSiteTreeFor($this->stat('tree_class'), null, 'ChildFoldersExcludeSecured');
     }
 
@@ -104,9 +110,10 @@ class NonSecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      * @param boolean $unlinked
      * @return array
      */
-    public function Breadcrumbs($unlinked = false) {
+    public function Breadcrumbs($unlinked = false)
+    {
         $items = parent::Breadcrumbs($unlinked);
-        if(isset($items[0]->Title)){
+        if (isset($items[0]->Title)) {
             $items[0]->Link = Controller::join_links(singleton('NonSecuredAssetAdmin')->Link('show'), 0);
         }
         return $items;
@@ -118,7 +125,8 @@ class NonSecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      * 
      * @return null
      */
-    public function doSync() {
+    public function doSync()
+    {
         $message = SecuredFilesystem::sync_secured();
         $this->response->addHeader('X-Status', rawurlencode($message));
 
@@ -132,11 +140,12 @@ class NonSecuredAssetAdmin extends AssetAdmin implements PermissionProvider {
      * @param SS_HTTPRequest $request
      * @return HTMLText
      */
-    public function addfolder($request) {
+    public function addfolder($request)
+    {
         $parentId = SecuredFilesystem::get_numeric_identifier($this, 'ParentID');
         $folder = DataObject::get_by_id("Folder", $parentId);
-        if($folder && $folder->exists()) {
-            if($folder->Secured) {
+        if ($folder && $folder->exists()) {
+            if ($folder->Secured) {
                 $message = _t('SecuredFilesystem.messages.ERROR_ACCESS_ONLY_IN_SECURED_FILES');
                 return SecuredFilesystem::show_access_message($this, $message);
             }
