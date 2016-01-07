@@ -10,32 +10,36 @@
  * @see {@link FolderSecured::securedSyncChildren()}
  * @todo Modify show_access_message() to show messages within the CMS.
  */
-class SecuredFilesystem extends Filesystem {
+class SecuredFilesystem extends Filesystem
+{
     
     /**
      * 
      * @param number $folderID
      * @return string
      */
-    public static function sync_secured($folderID = null) {
+    public static function sync_secured($folderID = null)
+    {
         $folder = DataObject::get_by_id('Folder', (int) $folderID);
-        if(!($folder && $folder->exists())) {
+        if (!($folder && $folder->exists())) {
             $folder = singleton('Folder');
         }
         
         $results = $folder->securedSyncChildren();
         $finished = false;
-        while(!$finished) {
+        while (!$finished) {
             $orphans = DB::query("SELECT \"C\".\"ID\" FROM \"File\" AS \"C\"
 				LEFT JOIN \"File\" AS \"P\" ON \"C\".\"ParentID\" = \"P\".\"ID\"
 				WHERE \"P\".\"ID\" IS NULL AND \"C\".\"ParentID\" > 0");
             $finished = true;
-            if($orphans) foreach($orphans as $orphan) {
-                $finished = false;
+            if ($orphans) {
+                foreach ($orphans as $orphan) {
+                    $finished = false;
                 // Delete the database record but leave the filesystem alone
                 $file = DataObject::get_by_id("File", $orphan['ID']);
-                $file->deleteDatabaseOnly();
-                unset($file);
+                    $file->deleteDatabaseOnly();
+                    unset($file);
+                }
             }
         }
         
@@ -54,7 +58,8 @@ class SecuredFilesystem extends Filesystem {
      * @param string $message
      * @return SS_HTTPResponse $response
      */
-    public static function show_access_message($controller, $message = '') {
+    public static function show_access_message($controller, $message = '')
+    {
         $response = $controller->getResponse();
         $response->setBody($message);
         $response->setStatusDescription($message);
@@ -69,21 +74,22 @@ class SecuredFilesystem extends Filesystem {
      * @param string $identifier e.g. 'ParentID' or 'ID'
      * @retun number
      */
-    public static function get_numeric_identifier(Controller $controller, $identifier = 'ID') {
+    public static function get_numeric_identifier(Controller $controller, $identifier = 'ID')
+    {
         // Deal-to all types of incoming data
-        if(!$controller->hasMethod('currentPageID')) {
+        if (!$controller->hasMethod('currentPageID')) {
             return 0;
         }
 
         // Use native SS logic to deal with an identifier of 'ID'
-        if($identifier == 'ID') {
+        if ($identifier == 'ID') {
             $useId = $controller->currentPageID();
         // Otherwise it's custom
         } else {
             $params = $controller->getRequest()->requestVars();
-            $idFromFunc = function() use($controller, $params, $identifier) {
-                if(!isset($params[$identifier])) {
-                    if(!isset($controller->urlParams[$identifier])) {
+            $idFromFunc = function () use ($controller, $params, $identifier) {
+                if (!isset($params[$identifier])) {
+                    if (!isset($controller->urlParams[$identifier])) {
                         return 0;
                     }
                     return $controller->urlParams[$identifier];

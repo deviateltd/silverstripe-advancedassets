@@ -8,7 +8,8 @@
  * @todo Why is a user with ADMIN always running tests?
  * @todo Complete commented assertions. Note: FolderSecured may need its own canView() definition
  */
-class FileSecuredTest extends FunctionalTest {
+class FileSecuredTest extends FunctionalTest
+{
     
     /**
      * 
@@ -36,7 +37,8 @@ class FileSecuredTest extends FunctionalTest {
     /**
      * Can ADMIN CMS users, view individual SECURED files in the CMS?
      */
-    public function testCanViewInCMSAsAdmin() {
+    public function testCanViewInCMSAsAdmin()
+    {
         $member = $this->objFromFixture('Member', 'can-view-is-admin');
 
         // LoggedInUsers: canView = yes
@@ -59,7 +61,8 @@ class FileSecuredTest extends FunctionalTest {
     /**
      * Can AdvancedAsset CMS users, view individual SECURED files in the CMS?
      */
-    public function testCanViewInCMSAsSecuredAssetAdmin() {
+    public function testCanViewInCMSAsSecuredAssetAdmin()
+    {
         $member = $this->objFromFixture('Member', 'can-view-secured-asset-admin');
 
         // LoggedInUsers: canView = yes
@@ -127,7 +130,8 @@ class FileSecuredTest extends FunctionalTest {
     /**
      * Can Standard CMS asset-admin users, view individual SECURED files in the CMS?
      */
-    public function testCanViewInCMSAsStandardAssetAdmin() {
+    public function testCanViewInCMSAsStandardAssetAdmin()
+    {
         $member = $this->objFromFixture('Member', 'can-view-standard-asset-admin-only');
 
         // LoggedInUsers: canView = no
@@ -191,7 +195,8 @@ class FileSecuredTest extends FunctionalTest {
     /**
      * Can AdvancedAsset CMS users, also view individual UNSECURED files in the CMS?
      */
-    public function testCanViewStandardAssetsInCMSAsSecuredAssetAdmin() {
+    public function testCanViewStandardAssetsInCMSAsSecuredAssetAdmin()
+    {
         $member = $this->objFromFixture('Member', 'can-view-secured-asset-admin');
 
         $file = $this->createUnSecuredFile();
@@ -202,7 +207,8 @@ class FileSecuredTest extends FunctionalTest {
      * Can Standard Asset CMS users, also view individual UNSECURED files in the CMS?
      * Essentially just replicates standard CMS tests for the same thing
      */
-    public function testCanViewStandardAssetsInCMSAsStandardAssetAdmin() {
+    public function testCanViewStandardAssetsInCMSAsStandardAssetAdmin()
+    {
         $member = $this->objFromFixture('Member', 'can-view-standard-asset-admin-only');
 
         $file = $this->createUnSecuredFile();
@@ -214,7 +220,8 @@ class FileSecuredTest extends FunctionalTest {
      *
      * See testCanViewFrontByUser() and testCanViewFrontByTime() for more complete tests
      */
-    public function testCanViewFrontNotLoggedIn() {
+    public function testCanViewFrontNotLoggedIn()
+    {
         // No logged-in users, but no  canViewFront = no
         $file = $this->createSecuredFile('CanViewType', 'LoggedInUsers');
         $this->assertFalse($file->canViewFront());
@@ -238,7 +245,8 @@ class FileSecuredTest extends FunctionalTest {
      *
      * See testCanViewFrontByUser() and testCanViewFrontByTime() for more complete tests
      */
-    public function testCanViewFrontLoggedIn() {
+    public function testCanViewFrontLoggedIn()
+    {
         // Standard AssetAdmin users
         $member = $this->objFromFixture('Member', 'can-view-standard-asset-admin-only');
 
@@ -306,7 +314,8 @@ class FileSecuredTest extends FunctionalTest {
     /**
      * Simply tests the return status of FileSecured::canViewFrontByTime() which looks weird out of context.
      */
-    public function testCanViewFrontByTime() {
+    public function testCanViewFrontByTime()
+    {
         $file = $this->createSecuredFile(null, null, array(
             'ParentID' => 1,
             'EmbargoType' => 'None'
@@ -337,7 +346,8 @@ class FileSecuredTest extends FunctionalTest {
     /**
      *
      */
-    public function testCanViewFrontByAnyone() {
+    public function testCanViewFrontByAnyone()
+    {
         // Logged-in only I'm afraid:canViewFrontByUser Deny
         $file = $this->createSecuredFile('CanViewType', 'LoggedInUsers');
         $this->assertFalse($file->canViewFrontByUser());
@@ -384,7 +394,8 @@ class FileSecuredTest extends FunctionalTest {
     /**
      * Can users accessing the frontend, while logged-in, access what they should and shouldn't?
      */
-    public function testCanViewFrontByLoggedInUsers() {
+    public function testCanViewFrontByLoggedInUsers()
+    {
         // For standard "Files" admin, logged-in users only - allow
         $member = $this->objFromFixture('Member', 'can-view-standard-asset-admin-only');
 
@@ -450,7 +461,8 @@ class FileSecuredTest extends FunctionalTest {
      * 
      * @return File
      */
-    private function createUnsecuredFile() {
+    private function createUnsecuredFile()
+    {
         $file = File::create();
         $file->ParentID = 1;
         $file->Secured = false;
@@ -467,13 +479,14 @@ class FileSecuredTest extends FunctionalTest {
      * @param array $props
      * @return File
      */
-    private function createSecuredFile($can = null, $type = null, $props = array()) {
+    private function createSecuredFile($can = null, $type = null, $props = array())
+    {
         $file = File::create();
         $file->Secured = true;
-        if($can && $type) {
+        if ($can && $type) {
             $file->$can = $type;
         }
-        foreach($props as $prop=>$val) {
+        foreach ($props as $prop=>$val) {
             $file->$prop = $val;
         }
         $file->write();
@@ -489,12 +502,13 @@ class FileSecuredTest extends FunctionalTest {
      * @param array $props
      * @return Folder
      */
-    private function createSecuredFolder($can, $type, $props = array()) {
+    private function createSecuredFolder($can, $type, $props = array())
+    {
         $folder = Folder::find_or_make(self::$test_folder);
         $folder->Secured = true;
         $folder->$can = $type;
         $folder->ParentID = 1;
-        foreach($props as $prop=>$val) {
+        foreach ($props as $prop=>$val) {
             $folder->$prop = $val;
         }
         $folder->write();

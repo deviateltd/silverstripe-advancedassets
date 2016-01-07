@@ -9,7 +9,8 @@
  * @todo Complete all possible permutations for canXX() methods
  * @todo Why is a user with ADMIN always running tests?
  */
-class CMSSecuredFileAddControllerTest extends FunctionalTest {
+class CMSSecuredFileAddControllerTest extends FunctionalTest
+{
 
     /**
      *
@@ -20,7 +21,8 @@ class CMSSecuredFileAddControllerTest extends FunctionalTest {
     /**
      * User may proceed to file-add controller (Admin)
      */
-    public function testInitValidateCanAddAsADMIN() {
+    public function testInitValidateCanAddAsADMIN()
+    {
         // First create and fetch a base folder for advanced assets
         $this->objFromFixture('Folder', 'is-secured');
 
@@ -32,7 +34,8 @@ class CMSSecuredFileAddControllerTest extends FunctionalTest {
     /**
      * User may proceed to file-add controller (Edit_All)
      */
-    public function testInitValidateCanAdd() {
+    public function testInitValidateCanAdd()
+    {
         // First create and fetch a base folder for advanced assets
         $this->objFromFixture('Folder', 'is-secured');
 
@@ -45,7 +48,8 @@ class CMSSecuredFileAddControllerTest extends FunctionalTest {
     /**
      * User may not proceed to file-add controller (View_All)
      */
-    public function testInitValidateCannotAdd() {
+    public function testInitValidateCannotAdd()
+    {
         // First create and fetch a base folder for advanced assets
         $this->objFromFixture('Folder', 'is-secured');
 

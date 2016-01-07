@@ -7,12 +7,14 @@
  * @package silverstripe-advancedassets
  * @todo Modify addFolder() and initValidate() to show messages within the CMS.
  */
-class CMSNonSecuredFileAddController extends CMSFileAddController {
+class CMSNonSecuredFileAddController extends CMSFileAddController
+{
     
     private static $url_segment = 'assets/add';
     private static $url_priority = 65;
 
-    public function init(){
+    public function init()
+    {
         parent::init();
         $this->initValidate();
     }
@@ -24,12 +26,13 @@ class CMSNonSecuredFileAddController extends CMSFileAddController {
      * @return SS_HTTPResponse
      * @todo Refactor into single static. There are v.close dupes of this in the other controllers.
      */
-    public function initValidate() {
+    public function initValidate()
+    {
         $folderId = SecuredFilesystem::get_numeric_identifier($this, 'ID');
-        if($folderId) {
-            $folder = DataObject::get_by_id("Folder", $folderId);        
-            if($folder && $folder->exists()) {
-                if($folder->Secured) {
+        if ($folderId) {
+            $folder = DataObject::get_by_id("Folder", $folderId);
+            if ($folder && $folder->exists()) {
+                if ($folder->Secured) {
                     $message = _t('SecuredFilesystem.messages.ERROR_ACCESS_ONLY_IN_SECURED_FILES');
                     return SecuredFilesystem::show_access_message($this, $message);
                 }
@@ -45,11 +48,12 @@ class CMSNonSecuredFileAddController extends CMSFileAddController {
      * @param boolean $unlinked
      * @return SS_List
      */
-    public function Breadcrumbs($unlinked = false) {
+    public function Breadcrumbs($unlinked = false)
+    {
         $items = parent::Breadcrumbs($unlinked);
         $originalLink = singleton('AssetAdmin')->Link('show');
         $changedLink = singleton('NonSecuredAssetAdmin')->Link('show');
-        foreach($items as $item) {
+        foreach ($items as $item) {
             $item->Link = str_replace($originalLink, $changedLink, $item->Link);
         }
         return $items;
@@ -62,7 +66,8 @@ class CMSNonSecuredFileAddController extends CMSFileAddController {
      * @return Form
      * @todo what template is used here? AssetAdmin_UploadContent.ss doesn't seem to be used anymore
      */
-    public function getEditForm($id = null, $fields = null) {
+    public function getEditForm($id = null, $fields = null)
+    {
         $form = parent::getEditForm($id, $fields);
         $folder = $this->currentPage();
         $backLink = LiteralField::create(

@@ -4,7 +4,8 @@
  * @author Deviate Ltd 2014-2015 http://www.deviate.net.nz
  * @package silverstripe-advancedassets
  */
-class SecuredFilesystemTest extends SapphireTest {
+class SecuredFilesystemTest extends SapphireTest
+{
     
     /**
      * Exercises SecuredFilesystem::get_numeric_identifier() with both types of expected controller
@@ -13,7 +14,8 @@ class SecuredFilesystemTest extends SapphireTest {
      * @todo Add 'ParentID' ensure this works as expected
      * @todo  Test with "unexpected" class, assert exedcption or error thrown as expecced (Zero is returned)
      */
-    public function testGetNumericIdentifierGet() {
+    public function testGetNumericIdentifierGet()
+    {
         $controller = $this->getTestController(array('ID' => '40'), 'GET', AssetAdmin::create());
         $result = SecuredFilesystem::get_numeric_identifier($controller, 'ID');
         $this->assertInternalType('integer', $result);
@@ -77,7 +79,8 @@ class SecuredFilesystemTest extends SapphireTest {
      * @todo Add 'ParentID' ensure this works as expected
      * @todo  Test with "unexpected" class, assert exedcption or error thrown as expecced (Zero is returned)
      */
-    public function testGetNumericIdentifierPost() {
+    public function testGetNumericIdentifierPost()
+    {
         $controller = $this->getTestController(array('ID' => '40'), 'POST', AssetAdmin::create());
         $result = SecuredFilesystem::get_numeric_identifier($controller, 'ID');
         $this->assertInternalType('integer', $result);
@@ -141,8 +144,9 @@ class SecuredFilesystemTest extends SapphireTest {
      * @pram Controller $controller
      * @return Controller
      */
-    private function getTestController($vars, $method, $controller) {
-        if($method == 'POST') {
+    private function getTestController($vars, $method, $controller)
+    {
+        if ($method == 'POST') {
             $getVars = array();
             $postVars = $vars;
         } else {
