@@ -398,7 +398,7 @@ class SecuredFileController extends Controller
      * @param File $file
      * @return boolean
      */
-    public function canSendToBrowser(File $file = null)
+    public function canSendToBrowser($file = null)
     {
         $canViewFront = true;
         if ($file instanceof File) {

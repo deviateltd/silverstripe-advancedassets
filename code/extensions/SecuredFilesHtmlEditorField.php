@@ -64,7 +64,7 @@ class SecuredFilesHtmlEditorField_Toolbar extends Extension
      * @param Image $file
      * @return void
      */
-    public function updateFieldsForImage(FieldList $fields, $url, Image $file)
+    public function updateFieldsForImage(FieldList $fields, $url, $file)
     {
         if (is_a($file, "HtmlEditorField_Image")) {
             $image = $file->getFile();

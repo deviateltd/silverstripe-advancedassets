@@ -74,7 +74,7 @@ class SecuredFilesystem extends Filesystem
      * @param string $identifier e.g. 'ParentID' or 'ID'
      * @retun number
      */
-    public static function get_numeric_identifier(Controller $controller, $identifier = 'ID')
+    public static function get_numeric_identifier($controller, $identifier = 'ID')
     {
         // Deal-to all types of incoming data
         if (!$controller->hasMethod('currentPageID')) {
