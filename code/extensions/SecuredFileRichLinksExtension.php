@@ -266,8 +266,7 @@ class SecuredFileRichLinksExtension extends Extension
         // Attach the file type and size to each of the links.
         for ($i = 0; $i < count($matches[0]); $i++) {
             $file = DataObject::get_by_id('File', $matches[1][$i]);
-            $notInStack = !in_array($file->ID, $fileStack);
-            if ($file && $file->exists() && $file->Secured && $notInStack) {
+            if ($file && $file->exists() && $file->Secured && !in_array($file->ID, $fileStack)) {
                 $fileStack[] = $file->ID;
                 $size = $file->getSize();
                 $ext = strtoupper($file->getExtension());
