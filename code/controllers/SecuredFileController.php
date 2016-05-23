@@ -24,10 +24,11 @@ class SecuredFileController extends Controller
     private static $bandwidth_threshold = 10240;
     
     /**
-     * Handle the requests, checking the request file is downloadable
+     * Handle the requests, checking the request file exists and is downloadable.
      * 
      * @param SS_HTTPRequest $request
      * @param DataModel $model
+     * @return mixed null
      */
     public function handleRequest(SS_HTTPRequest $request, DataModel $model)
     {
@@ -59,7 +60,8 @@ class SecuredFileController extends Controller
         // make the $url normalised as "assets/somefolder/somefile.ext, so we could find the file record if it has.
         $url = Director::makeRelative(ltrim(str_replace(BASE_URL, '', $address['url']), '/'));
         $file = File::find($url);
-        if ($file) {
+        $exists = file_exists($file->getFullPath()); // F/S check added to File::exists() in SS v3.2.0
+        if ($file && $exists) {
             if ($this->canSendToBrowser($file)) {
                 //when requesting a re-sampled image, $file is the original image, hence we need to reset the file path
                 if (preg_match('/_resampled\/[^-]+-/', $url)) {
