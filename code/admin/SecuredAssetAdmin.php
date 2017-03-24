@@ -132,6 +132,7 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider
         $list = $list->filter("Secured", 1);
         $securedRoot = FileSecured::getSecuredRoot();
         $list = $list->exclude("ID", $securedRoot->ID);
+        $this->extend('updateList', $list);
         return $list;
     }
 
@@ -248,7 +249,11 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider
     public function SiteTreeAsUL()
     {
         $root = FileSecured::getSecuredRoot();
-        return $this->getSiteTreeFor($this->stat('tree_class'), $root->ID, 'ChildFoldersOnlySecured');
+        $childrenMethod = 'ChildFoldersOnlySecured';
+        $this->extend('updateChildrenMethod', $childrenMethod);
+        $tree = $this->getSiteTreeFor($this->stat('tree_class'), $root->ID, $childrenMethod);
+
+        return $tree;
     }
 
     /**

@@ -94,6 +94,7 @@ class NonSecuredAssetAdmin extends AssetAdmin implements PermissionProvider
     {
         $list = parent::getList();
         $list = $list->exclude("Secured", "1");
+        $this->extend('updateList', $list);
         return $list;
     }
 
@@ -103,7 +104,10 @@ class NonSecuredAssetAdmin extends AssetAdmin implements PermissionProvider
      */
     public function SiteTreeAsUL()
     {
-        return $this->getSiteTreeFor($this->stat('tree_class'), null, 'ChildFoldersExcludeSecured');
+        $childrenMethod = 'ChildFoldersExcludeSecured';
+        $this->extend('updateChildrenMethod', $childrenMethod);
+        $tree = $this->getSiteTreeFor($this->stat('tree_class'), null, $childrenMethod);
+        return $tree;
     }
 
     /**
