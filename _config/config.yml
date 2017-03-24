@@ -6,6 +6,8 @@ After:
 Before:
   - 'subsites/*'
 ---
+Injector:
+  UploadField_SelectHandler: SecuredUploadField_SelectHandler
 FileNameFilter: # enable underscore
   default_replacements: {'/\s/':'-','/_/':'_','/[^A-Za-z0-9+.\-_]+/':'','/[\-]{2,}/':'-','/^[\.\-]+/':''}
 Filesystem:
