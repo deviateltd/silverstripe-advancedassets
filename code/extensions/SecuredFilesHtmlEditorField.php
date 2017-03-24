@@ -45,20 +45,6 @@ class SecuredFilesHtmlEditorField_Toolbar extends Extension
 
     /**
      * 
-     * @param Form $form
-     * @return void
-     */
-    public function updateLinkForm(Form $form)
-    {
-        $fields = $form->Fields();
-        $fileField = $fields->dataFieldByName('file');
-        if (!Permission::check(array("ADMIN", "SECURED_FILES_VIEW_ALL"))) {
-            $fileField->setFilterFunction(create_function('$node', "return \$node->Secured == 0;"));
-        }
-    }
-
-    /**
-     * 
      * @param FieldList $fields
      * @param string $url
      * @param Image $file
