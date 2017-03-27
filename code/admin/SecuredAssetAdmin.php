@@ -149,6 +149,8 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider
             return $this->request->requestVar('ID');
         } elseif (is_numeric($this->urlParams['ID'])) {
             return $this->urlParams['ID'];
+        } elseif (Session::get("{$this->class}.currentPage")) {
+            return Session::get("{$this->class}.currentPage");
         } else {
             $securedRoot = FileSecured::getSecuredRoot();
             if ($securedRoot && $securedRoot->exists()) {
