@@ -149,8 +149,6 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider
             return $this->request->requestVar('ID');
         } elseif (is_numeric($this->urlParams['ID'])) {
             return $this->urlParams['ID'];
-        } elseif (Session::get("{$this->class}.currentPage")) {
-            return Session::get("{$this->class}.currentPage");
         } else {
             $securedRoot = FileSecured::getSecuredRoot();
             if ($securedRoot && $securedRoot->exists()) {
@@ -200,7 +198,14 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider
             $form->Fields()->removeByName("DetailsView");
             $config->removeComponentsByType("GridFieldLevelup");
         } else {
-            $config->getComponentByType("GridFieldLevelup")->setLinkSpec('admin/' . self::$url_segment . '/show/%d');
+            $link = 'admin/' . self::$url_segment . '/show/%d';
+            if(class_exists('Subsite')) {
+                $subsiteID = (int)Subsite::currentSubsiteID();
+                if ($subsiteID) {
+                    $link .= '?SubsiteID='.$subsiteID;
+                }
+            }
+            $config->getComponentByType("GridFieldLevelup")->setLinkSpec($link);
         }
 
         $gridField->setTitle(_t("SECUREDASSETADMIN.SecuriedFiles", "Advanced Assets"));
@@ -275,6 +280,20 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider
         }
         if (isset($items[0]->Title)) {
             $items[0]->Title = _t("SECUREDASSETADMIN.SecuriedFiles", SECURED_FILES_MODULE_NAME);
+
+            if (isset($items[0]->Title)) {
+                $items[0]->Title = _t("SECUREDASSETADMIN.SecuriedFiles", SECURED_FILES_MODULE_NAME);
+                if(class_exists('Subsite')) {
+                    $subsiteID = (int) Subsite::currentSubsiteID();
+                    if($subsiteID) {
+                        if(parse_url($items[0]->Link, PHP_URL_QUERY)) {
+                            $items[0]->Link .= '&SubsiteID='.$subsiteID;
+                        } else {
+                            $items[0]->Link .= '?SubsiteID='.$subsiteID;
+                        }
+                    }
+                }
+            }
         }
 
         return $items;
