@@ -59,7 +59,17 @@ class SecuredFileController extends Controller
         
         // make the $url normalised as "assets/somefolder/somefile.ext, so we could find the file record if it has.
         $url = Director::makeRelative(ltrim(str_replace(BASE_URL, '', $address['url']), '/'));
+        if(class_exists('Subsite')) {
+            $disable_subsite_filter_orig = Config::inst()->get('Subsite', 'disable_subsite_filter');
+            Config::inst()->update('Subsite', 'disable_subsite_filter', true);
+            Subsite::disable_subsite_filter(true);
+        }
         $file = File::find($url);
+        if(class_exists('Subsite')) {
+            Config::inst()->update('Subsite', 'disable_subsite_filter', $disable_subsite_filter_orig);
+            Subsite::disable_subsite_filter($disable_subsite_filter_orig);
+        }
+
         $exists = $file && file_exists($file->getFullPath()); // F/S check added to File::exists() in SS v3.2.0
         if ($exists) {
             if ($this->canSendToBrowser($file)) {
