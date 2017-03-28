@@ -145,22 +145,33 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider
      */
     public function currentPageID()
     {
-        if (is_numeric($this->request->requestVar('ID'))) {
-            return $this->request->requestVar('ID');
-        } elseif (is_numeric($this->urlParams['ID'])) {
-            return $this->urlParams['ID'];
-        } elseif (Session::get("{$this->class}.currentPage")) {
-            return Session::get("{$this->class}.currentPage");
+        $securedRoot = FileSecured::getSecuredRoot();
+        if ($securedRoot && $securedRoot->exists()) {
+            $securedRootID = $securedRoot->ID;
         } else {
+            SecuredAssetAdmin::instantiate();
             $securedRoot = FileSecured::getSecuredRoot();
-            if ($securedRoot && $securedRoot->exists()) {
-                return $securedRoot->ID;
-            } else {
-                SecuredAssetAdmin::instantiate();
-                $securedRoot = FileSecured::getSecuredRoot();
-                return $securedRoot->ID;
+            $securedRootID = $securedRoot->ID;
+        }
+        $id = $securedRootID;
+        $request = $this->getRequest();
+        if(is_numeric($request->requestVar('ID')))	{
+            $id = $request->requestVar('ID');
+        } elseif ($request->param('ID')) {
+            $id = $request->param('ID');
+        }
+
+        // Detect current folder in gridfield item edit view
+        if ($id && $id > 0) {
+            if (!Folder::get()->filter('ID', $id)->exists()) {
+                $file = File::get()->byID($id);
+                $id = ($file) ? $file->ParentID : $securedRootID;
             }
         }
+
+        $id = (int)$id;
+        $this->setCurrentPageID($id);
+        return $id;
     }
 
     /**
