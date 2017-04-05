@@ -266,30 +266,34 @@ class SecuredFileRichLinksExtension extends Extension
         // Attach the file type and size to each of the links.
         for ($i = 0; $i < count($matches[0]); $i++) {
             $file = DataObject::get_by_id('File', $matches[1][$i]);
-            if ($file && $file->exists() && $file->Secured && !in_array($file->ID, $fileStack)) {
+            if ($file && $file->exists() && !in_array($file->ID, $fileStack)) {
                 $fileStack[] = $file->ID;
                 $size = $file->getSize();
                 $ext = strtoupper($file->getExtension());
-                $canViewByTime = $file->canViewFrontByTime();
-                $canViewByUser = $file->canViewFrontByUser();
+                if($file->Secured){
+                    $canViewByTime = $file->canViewFrontByTime();
+                    $canViewByUser = $file->canViewFrontByUser();
 
-                if ($canViewByTime && $canViewByUser) {
-                    $class = "";
-                } elseif (!$canViewByTime) {
-                    $class = "secured unavailable";
-                } else { // $canViewByUser is false only
-                    $class = "secured";
-                }
+                    if ($canViewByTime && $canViewByUser) {
+                        $class = "";
+                    } elseif (!$canViewByTime) {
+                        $class = "secured unavailable";
+                    } else { // $canViewByUser is false only
+                        $class = "secured";
+                    }
 
-                if ($class !== "") {
-                    $newLink = "<a class=\"".$class."\" ".substr($matches[0][$i], 2);
-                    if (!$canViewByTime) {
-                        $newLink = str_replace(array("<a", " target=\"_blank\"", "href", "</a>"), array("<span", "", "data-file-link", "</span>"), $newLink);
+                    if ($class !== "") {
+                        $newLink = "<a class=\"".$class."\" ".substr($matches[0][$i], 2);
+                        if (!$canViewByTime) {
+                            $newLink = str_replace(array("<a", " target=\"_blank\"", "href", "</a>"), array("<span", "", "data-file-link", "</span>"), $newLink);
+                        }
+                    } else {
+                        $newLink = $matches[0][$i];
                     }
                 } else {
                     $newLink = $matches[0][$i];
                 }
-                
+
                 $newLink .= "<span class='fileExt'> [$ext, $size]</span>";
                 $originals[] = $matches[0][$i];
                 $replacements[] = $newLink;
