@@ -14,7 +14,7 @@ class SecuredUploadField_SelectHandler extends UploadField_SelectHandler {
     {
         $selectComposite = parent::getListField($folderID);
 
-        if (true || !Permission::check(array("ADMIN", "SECURED_FILES_VIEW_ALL"))) {
+        if (!Permission::check(array("ADMIN", "SECURED_FILES_VIEW_ALL"))) {
             $parentIDField = $selectComposite->fieldByName('ParentID');
             $parentIDField->setFilterFunction(create_function('$node', "return \$node->Secured == 0;"));
 
