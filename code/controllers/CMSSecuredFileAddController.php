@@ -19,6 +19,9 @@ class CMSSecuredFileAddController extends CMSFileAddController
     public function init()
     {
         parent::init();
+        if($this->request->requestVar('ID') && is_numeric($this->request->requestVar('ID'))) {
+            $this->setCurrentPageID($this->request->requestVar('ID'));
+        }
         $this->initValidate();
     }
 

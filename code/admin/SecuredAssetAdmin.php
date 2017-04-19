@@ -67,6 +67,9 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider
     {
         self::instantiate();
         parent::init();
+        if($this->request->requestVar('ID') && is_numeric($this->request->requestVar('ID'))) {
+            $this->setCurrentPageID($this->request->requestVar('ID'));
+        }
         $this->initValidate();
     }
 
