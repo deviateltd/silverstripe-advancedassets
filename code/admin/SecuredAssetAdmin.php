@@ -173,6 +173,7 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider
         }
 
         $id = (int)$id;
+        if($id === 0) $id = $securedRootID;
         $this->setCurrentPageID($id);
         return $id;
     }
