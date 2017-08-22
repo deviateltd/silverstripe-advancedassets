@@ -156,14 +156,13 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider
             $securedRoot = FileSecured::getSecuredRoot();
             $securedRootID = $securedRoot->ID;
         }
-        $id = $securedRootID;
+        $id = 0;
         $request = $this->getRequest();
         if(is_numeric($request->requestVar('ID')))	{
             $id = $request->requestVar('ID');
-        } elseif ($request->param('ID')) {
+        } elseif (is_numeric($request->param('ID'))) {
             $id = $request->param('ID');
         }
-
         // Detect current folder in gridfield item edit view
         if ($id && $id > 0) {
             if (!Folder::get()->filter('ID', $id)->exists()) {
@@ -173,7 +172,11 @@ class SecuredAssetAdmin extends AssetAdmin implements PermissionProvider
         }
 
         $id = (int)$id;
-        if($id === 0) $id = $securedRootID;
+        if($id === 0 && !$request->param('Action') && !$request->param('ID')) {
+            //only set $id to be the $securedRootID when we landing on the Advanced Assets admin
+            //i.e. https://www.domain.com/admin/advanced-assets/
+            $id = $securedRootID;
+        }
         $this->setCurrentPageID($id);
         return $id;
     }
