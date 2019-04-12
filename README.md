@@ -1,5 +1,7 @@
 # SilverStripe Advanced Assets
 
+This version should work with PHP 7.2 and SilverStripe 3.7
+
 Provides an additional Files admin area in the CMS in parallel with the CMS' standard
 Files admin area. It allows for some "advanced" file and folder features as follows:
 
